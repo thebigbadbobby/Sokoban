@@ -37,7 +37,7 @@ def getActionFromArray(array):
         return "W"
     if randnum < array[6]:
         return "S"
-    if randnum < array[6]:
+    if randnum < array[7]:
         return "D"
     return "STOP"
 def trace(game, commandHistory):

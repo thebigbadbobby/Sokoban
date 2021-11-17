@@ -13,7 +13,7 @@ from model import *
 #   Dot   = 2
 #   Crate = _0
 #   Person= _1
-model=encoder((28, 28, 1),8)
+model=encoder((28, 28, 1),9)
 def generate_sokoban(model, rows, cols, boxes):
     board=np.random.rand(rows-2,cols-2)
     print(board)
