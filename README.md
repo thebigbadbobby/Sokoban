@@ -8,17 +8,21 @@ another that is trained to solve them. The models use Monte Carlo branching to f
 
 ### Classes
 ##### Model
-###### Encodeboard()
+###### encodeboard(board, size)
 encodes a board state into the format that the neural network takes as input (1, n, n, 1).
-###### arraySum()
+- return: board padded to be size x size matrix
+###### arraySum(array)
 normalizes model output to be turned into probabilities.
+- return: normalized probability distribution, ready to be evaluated
 ###### getActionFromArray()
 decides which branch to take based on array weights.
-###### trace()
+- return: action derived from evaluation of probability distrobution
+###### trace(game, commandHistory)
 forensically finds all the board state action pairs taken after a successful attempt.
+- return: TBD
 ###### encoder()
 defines CNN model.
-
+- return: keras CNN model
 ##### Game
 ###### init() 
 sets up the given board with an empty history of actions and a pre-filled list of possible actions and tracks coordinates of the person
