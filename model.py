@@ -10,7 +10,7 @@ def encodeboard(board, size):
     bigboard=np.zeros(size)
     bigboard[:np.array(board).shape[0],:np.array(board).shape[1]]=np.array(board)
     
-    return bigboard.reshape((1,size,size,1))
+    return bigboard.reshape((1,size[0],size[0],1))
 def arraySum(array):
     sums=0
     for i in range(0,len(array[0])):

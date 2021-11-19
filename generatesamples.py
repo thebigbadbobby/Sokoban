@@ -53,7 +53,7 @@ def generate_sokoban(model, rows, cols, boxes):
                 break
             # print(example.toString())
             # print(example.commandHistory)
-            action=getActionFromArray(arraySum(model.predict(encodeboard(generated.board, 28))))
+            action=getActionFromArray(arraySum(model.predict(encodeboard(generated.board, (28,28)))))
             generated.process(action)
             index+=1
             if index>200:
