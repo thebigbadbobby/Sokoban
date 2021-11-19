@@ -53,6 +53,8 @@ def main(args):
             lineSplit = line.split()
             if count == 0:
                   numWall = int(lineSplit.pop(0))
+                  print(lineSplit)
+                  print(len(lineSplit))
                   for i in range(0, len(lineSplit), 2):
                         wallCords.append((int(lineSplit[i]) - 1, (int(lineSplit[i+1])) - 1))
                   
@@ -88,7 +90,8 @@ def main(args):
                         board[i][j] = 1
       # print(board)
       # print(game(board).toString())
-      print(solve(board, model, 1000))
+      print(board)
+      print(solve(board, model, 3))
       
       
 
