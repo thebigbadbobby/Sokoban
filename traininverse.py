@@ -8,5 +8,5 @@ def evaluateperformance(samples, model, invmodel, maxiter):
         results.append(solve(board, model, maxiter))
     print(results)
 model=encoder((28, 28, 1),4)
-invmodel=encoder((28, 28, 1),9)
+invmodel=encoder((28, 28, 1),8)
 evaluateperformance(10, model, invmodel, 100)

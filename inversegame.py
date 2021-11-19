@@ -84,11 +84,11 @@ class inversegame:
     def move(self, start, end, isPull=False, isperson=True):
         trail=[2*start[0]-end[0],2*start[1]-end[1]]
         # print("z")
-        print(self.board[start[0]][start[1]], start[0], start[1])
+        # print(self.board[start[0]][start[1]], start[0], start[1])
         startvalue=self.board[start[0]][start[1]]
         endvalue=self.board[end[0]][end[1]]
         trailingvalue=self.board[trail[0]][trail[1]]
-        print(startvalue, endvalue, trailingvalue)
+        # print(startvalue, endvalue, trailingvalue)
         # print("aardvark")
         # print(startvalue, endvalue)
         if endvalue!=0 and endvalue<10:

@@ -83,7 +83,7 @@ class game:
             if isperson==True:
                 self.move(end, [2*end[0]-start[0], 2*end[1]-start[1]], False)
             else:
-                return False
+                return #False
         startvalue=self.board[start[0]][start[1]]
         endvalue=self.board[end[0]][end[1]]
         # print("aardvark")
@@ -100,7 +100,7 @@ class game:
             # print(startvalue,endvalue)
             
         else: 
-            return False
+            return #False
         self.reset()
     def isWon(self):
         for row in self.board:
