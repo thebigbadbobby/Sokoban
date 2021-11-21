@@ -13,7 +13,7 @@ The neural network begins with a 28 x 28 matrix that represents the state of the
 <img width="716" alt="Screen Shot 2021-11-20 at 10 22 56 PM" src="https://user-images.githubusercontent.com/17601102/142752115-66f6e509-a69a-4d4e-b03c-2d239209d949.png">
 
 ##### Value Network
-<img width="779" alt="Screen Shot 2021-11-20 at 10 37 39 PM" src="https://user-images.githubusercontent.com/17601102/142752499-fe76ed17-acfe-48d8-92a1-3265d09954ed.png">
+<img width="752" alt="Screen Shot 2021-11-20 at 10 47 42 PM" src="https://user-images.githubusercontent.com/17601102/142752661-9d930254-394d-400f-a984-6ba9f95415a8.png">
 
 
 
