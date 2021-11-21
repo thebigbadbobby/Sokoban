@@ -7,6 +7,7 @@ another that is trained to solve them. The models use Monte Carlo branching to f
 <img width="235" alt="Screen Shot 2021-11-18 at 2 23 57 PM" src="https://user-images.githubusercontent.com/17601102/142506460-aed93db1-b4e8-49e1-ac23-358f36d85b39.png">
 
 ### Model
+<img width="704" alt="Screen Shot 2021-11-20 at 9 18 31 PM" src="https://user-images.githubusercontent.com/17601102/142750677-33a5bce9-46c4-43cf-99b8-cbbbc2440f16.png">
 
 ### Classes
 ##### Game
