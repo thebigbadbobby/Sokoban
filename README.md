@@ -6,8 +6,9 @@ another that is trained to solve them. The models use Monte Carlo branching to f
 <img width="1682" alt="Screen Shot 2021-11-17 at 9 12 35 AM" src="https://user-images.githubusercontent.com/17601102/142249416-901fb88c-0b96-4e00-8f37-37d931f88048.png">
 <img width="235" alt="Screen Shot 2021-11-18 at 2 23 57 PM" src="https://user-images.githubusercontent.com/17601102/142506460-aed93db1-b4e8-49e1-ac23-358f36d85b39.png">
 
-### Model
-<img width="704" alt="Screen Shot 2021-11-20 at 9 18 31 PM" src="https://user-images.githubusercontent.com/17601102/142750677-33a5bce9-46c4-43cf-99b8-cbbbc2440f16.png">
+### Policy Netowrk Model
+<img width="716" alt="Screen Shot 2021-11-20 at 10 22 56 PM" src="https://user-images.githubusercontent.com/17601102/142752115-66f6e509-a69a-4d4e-b03c-2d239209d949.png">
+
 The neural network begins with a 28 x 28 matrix that represents the state of the board. Each entry is one-hot-encoded. The input is funneled into a 32 x 32 Conv2d array and increased in size to a 64x64 and then flattened into a 4096 parameter feedforward neural network that outputs a 4x1 matrix representing which of the actions to take.
 
 ### Classes
