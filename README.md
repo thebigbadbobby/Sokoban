@@ -6,6 +6,8 @@ another that is trained to solve them. The models use Monte Carlo branching to f
 <img width="1682" alt="Screen Shot 2021-11-17 at 9 12 35 AM" src="https://user-images.githubusercontent.com/17601102/142249416-901fb88c-0b96-4e00-8f37-37d931f88048.png">
 <img width="235" alt="Screen Shot 2021-11-18 at 2 23 57 PM" src="https://user-images.githubusercontent.com/17601102/142506460-aed93db1-b4e8-49e1-ac23-358f36d85b39.png">
 
+### Model
+
 ### Classes
 ##### Game
 ###### init(self, board) 
@@ -66,8 +68,6 @@ forensically finds all the board state action pairs taken after a successful att
 ###### encoder(inputsize, outputsize)
 defines CNN model according to size constraints.
 - return: keras CNN model
-
-##### Neural Network Diagram
 
 
 ##### GenerateSamples
