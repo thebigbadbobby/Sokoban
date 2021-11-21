@@ -8,7 +8,7 @@ another that is trained to solve them. The models use Monte Carlo branching to f
 
 ### Model
 <img width="704" alt="Screen Shot 2021-11-20 at 9 18 31 PM" src="https://user-images.githubusercontent.com/17601102/142750677-33a5bce9-46c4-43cf-99b8-cbbbc2440f16.png">
-The neural network begins with a 28 x 28 matrix that represents the state of the board. Each entry is one-hot-encoded. The input is funneled into a 32 x 32 Conv2d array and increased in size to a 64x64 and then flattened into a single dimension feedforward neural network that outputs a 4x1 matrix representing which of the actions to take.
+The neural network begins with a 28 x 28 matrix that represents the state of the board. Each entry is one-hot-encoded. The input is funneled into a 32 x 32 Conv2d array and increased in size to a 64x64 and then flattened into a 4096 parameter feedforward neural network that outputs a 4x1 matrix representing which of the actions to take.
 
 ### Classes
 ##### Game
