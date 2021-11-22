@@ -70,15 +70,7 @@ def main(args):
                   playerStart = (int(lineSplit[0]), int(lineSplit[1]))
             count += 1
       f.close()
-      # print(numWall)
-      # print(noStorage)
-      # print(noBox)
-      # print(playerStart)
-      # print(wallCords)
-      # print(boxCords)
-      # print(storCords)
       board = np.zeros((row, col))
-      # print(board)
       board[playerStart[0] - 1][playerStart[1] - 1] = 11
       for (x, y) in boxCords:
             board[x-1][y-1] = 10
@@ -89,8 +81,6 @@ def main(args):
                   if (i, j) not in wallCords and board[i][j] ==0:
                         board[i][j] = 1
       print(board)
-      # print(game(board).toString())
-      # print(board)
       print(solve(board, model, 3))
       
       

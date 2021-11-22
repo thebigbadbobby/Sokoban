@@ -1,3 +1,5 @@
+import numpy as np
+
 class game:
     def __init__(self, board):
         self.board=board
@@ -102,6 +104,51 @@ class game:
         else: 
             return #False
         self.reset()
+
+    # method similar to https://github.com/JoshVarty/AlphaZeroSimple/blob/master/game.py 
+    def get_reward_for_player(self):
+        if self.isWon():
+            return 1
+        else:
+            return None # try this out, then try attempts out then try outright returning 0 for loss
+    def validCords(self, cords):
+        #top board
+        if cords[0] == 0 and cords[1] == 0:
+            return [(cords[0] + 1, cords[1]), (cords[0], cords[1] + 1)]
+        if cords[0] == 0 and cords[1] == len(self.board[0]) - 1:
+            return [(cords[0], cords[1] - 1), (cords[0] + 1, cords[1])]
+        if cords[0] == 0 and not cords[1] == 0:
+            return [(cords[0], cords[1] + 1), (cords[0], cords[1] - 1), (cords[0] + 1, cords[1])]
+
+        #bottom board
+        if cords[0] == len(self.board) - 1 and cords[1] == 0:
+            return [(cords[0] - 1, cords[1]), (cords[0], cords[1] + 1)]
+        if cords[0] == len(self.board) - 1 and cords[1] == len(self.board[0]) - 1:
+            return([cords[0] - 1, cords[1], (cords[0], cords[1] - 1)])
+        if cords[0] == len(self.board) - 1 and not cords[1] == 0:
+            return[(cords[0] - 1, cords[1]), (cords[0], cords[1] - 1), (cords[0], cords[1] + 1)]
+        
+        #sides of the board
+        if not cords[0] == 0 and cords[1] == 0:
+            return [(cords[0] + 1, cords[1]), (cords[0] - 1, cords[1]), (cords[0], cords[1] + 1)]
+        if not cords[0] == 0 and cords[1] == len(self.board[0]) - 1:
+            return [((cords[0] + 1, cords[1]), (cords[0] - 1, cords[1]), (cords[0], cords[1] - 1))]
+        
+        #if your in the middle go up down left right
+        return [(cords[0] + 1, cords[1]), (cords[0] - 1, cords[1]), (cords[0], cords[1] + 1), (cords[0], cords[1] - 1)]
+    def get_valid_moves(self):
+        cords = self.findPerson()
+        validMoves = self.validCords(cords)
+        
+        # everything is an invalid move by making np array 
+        #for validMoves, mark i, j as 1
+        newBoard = np.zeros((self.board.shape))
+        for (x, y) in validMoves:
+            newBoard[x][y] = 1
+        return newBoard
+        
+
+
     def isWon(self):
         for row in self.board:
             for entry in row:
