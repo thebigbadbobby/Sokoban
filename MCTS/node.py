@@ -49,6 +49,7 @@ class Node:
 
         return action
 
+    # make action put out something that indicates right, left, etc. 
     def select_child(self):
         """
         Select the child with the highest UCB score.
@@ -71,9 +72,14 @@ class Node:
         We expand a node and keep track of the prior policy probability given by neural network
         """
         self.state = state
-        for a, prob in enumerate(action_probs):
-            if prob != 0:
-                self.children[a] = Node(prior=prob)
+        for i in range(0, len(action_probs)):
+            for j in range(0, len(action_probs[i])):
+                prob = action_probs[i][j]
+                if prob != 0:
+                    self.children[(i, j)] = Node(prior = prob)
+        # for a, prob in enumerate(action_probs):
+        #     if prob != 0:
+        #         self.children[a] = Node(prior=prob)
 
     def __repr__(self):
         """
