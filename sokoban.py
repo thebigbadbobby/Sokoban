@@ -15,8 +15,8 @@ import sys, getopt
 #   Dot   = 2
 #   Crate = _0
 #   Person= _1
-
-model=encoder((28, 28, 1),4)
+size = 28
+model=encoder((size, size, 1),4)
 # board=[[1, 1, 0, 0, 0, 0, 0, 1],
 #        [0, 0, 0, 1, 1, 1, 0, 1],
 #        [0, 2,11,10, 1, 1, 0, 1],
@@ -88,9 +88,9 @@ def main(args):
             for j in range(0, col):
                   if (i, j) not in wallCords and board[i][j] ==0:
                         board[i][j] = 1
-      # print(board)
-      # print(game(board).toString())
       print(board)
+      # print(game(board).toString())
+      # print(board)
       print(solve(board, model, 3))
       
       
