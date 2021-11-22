@@ -10,6 +10,7 @@ another that is trained to solve them. The models use Monte Carlo branching to f
 ##### Policy Network
 
 The neural network begins with a 28 x 28 matrix that represents the state of the board. Each entry is one-hot-encoded. The input is funneled into a 32 x 32 Conv2d array and increased in size to a 64x64 and then flattened into a 4096 parameter feedforward neural network that outputs a 4x1 matrix representing which of the actions to take.
+
 <img width="716" alt="Screen Shot 2021-11-20 at 10 22 56 PM" src="https://user-images.githubusercontent.com/17601102/142752115-66f6e509-a69a-4d4e-b03c-2d239209d949.png">
 
 ##### Value Network
