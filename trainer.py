@@ -7,6 +7,7 @@ import torch.optim as optim
 
 from MonteCarlo.BasicMonte import MCTS
 import game as game
+import copy
 class Trainer:
 
     def __init__(self, game, model, args, size):
@@ -20,20 +21,14 @@ class Trainer:
     def exceute_episode(self):
 
         train_examples = []
-        current_player = 1
-        state = np.ndarray.flatten(self.game.getBoard())
+        self.game.initBoard()
 
         while True:
-            # canonical_board = self.game.get_canonical_board(state, current_player)
             board = np.ndarray.flatten(self.game.getBoard())
             self.mcts = MCTS(self.game, self.model, self.args)
             root = self.mcts.run(self.model, board)
-            # we need to figure out how to 1d the array where I put stuff in that dictionary as 2d array
             action_probs = [0 for _ in range(self.action_size)]
             i = 0
-            # print(len(list(root.children.items())))
-            # print('here')
-            # print(type(root.children[(0, 1)]))
             for k in root.children.keys():
                 # print(type(root.children[k]))
                 # exit()
@@ -61,8 +56,8 @@ class Trainer:
             print("{}/{}".format(i, self.args['numIters']))
 
             train_examples = []
-
             for eps in range(self.args['numEps']):
+                print('eps #: ', eps)
                 iteration_train_examples = self.exceute_episode()
                 train_examples.extend(iteration_train_examples)
 

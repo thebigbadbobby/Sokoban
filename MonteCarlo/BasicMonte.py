@@ -51,24 +51,38 @@ class Node:
         return action
 
     # make action put out something that indicates right, left, etc. 
-    def select_child(self):
+    def select_child(self, game):
         """
         Select the child with the highest UCB score.
         """
         best_score = -np.inf
-        best_action = -1
+        cords = game.findPerson()
+        best_action = (0, 0)
         best_child = None
 
         for action, child in self.children.items():
             score = ucb_score(self, child)
-            if score > best_score:
+            # print(action)
+            if score > best_score and game.checkValid(action):
                 best_score = score
                 best_action = action
                 best_child = child
+        if not best_child:
+            # print('wee woo')
+            # print()
+            # print('not bsts child')
+            for action, child in self.children.items():
+                score = ucb_score(self, child)
+                # print(action)
+                if score > best_score:
+                    best_score = score
+                    best_action = action
+                    best_child = child
         # print("best_action: ", best_action)
+        # print("game location: ", game.findPerson())
         return best_action, best_child
 
-    def expand(self, state, action_probs):
+    def expand(self, state, action_probs, game):
         """
         We expand a node and keep track of the prior policy probability given by neural network
         """
@@ -79,7 +93,9 @@ class Node:
                 prob = action_probs[i][j]
                 # print(prob)
                 # exit()
-                if prob != 0:
+                if game.checkValid((i, j)) or prob != 0:
+                    # print('inside')
+                    # print(i, j)
                     self.children[(i, j)] = Node(prior = prob)
         # for a, prob in enumerate(action_probs):
         #     if prob != 0:
@@ -108,44 +124,44 @@ class MCTS:
         action_probs, value = model.predict(state)
         # translate action_probs into a mxn array
         # ogAction_probs = action_probs
-        action_probs = np.array(action_probs).reshape(28, 28)
+        action_probs = np.array(action_probs).reshape(45, 45) # map these to a size var
         # print(ogAction_probs.shape)
         valid_moves = self.game.get_valid_moves() #we know the moves can be up, left, down right so mask based off of position
         action_probs = action_probs * valid_moves  # mask invalid moves
         action_probs /= np.sum(action_probs)
-        root.expand(state, action_probs)
+        root.expand(state, action_probs, self.game)
 
-        for _ in range(self.args['num_simulations']):
+        for i in range(self.args['num_simulations']):
+            print("i: ", i)
             node = root
             search_path = [node]
 
             # SELECT
-            while node.expanded():
-                action, node = node.select_child()
+            while node and node.expanded():
+                # print('select')
+                action, node = node.select_child(self.game)
                 search_path.append(node)
+                # print(node)
 
             parent = search_path[-2]
             state = parent.state
             # Now we're at a leaf node and we would like to expand
             # Players always play from their own perspective
-
-            #reroute to our function
             next_state = self.game.get_next_state(action)
-            # # Get the board from the perspective of the other player (WE DONT NEED THIS?)
-            # next_state = self.game.get_canonical_board(next_state, player=-1)
-
+            # print(next_state)
             # The value of the new state from the perspective of the other player
             value = self.game.get_reward_for_player() # a function that determines if we finished or 
+            # print(value)
             if value is None:
                 # If the game has not ended:
                 # EXPAND
                 action_probs, value = model.predict(next_state)
                 valid_moves = self.game.get_valid_moves()
                 # ogAction_probs = action_probs
-                action_probs = np.array(action_probs).reshape(28, 28)
+                action_probs = np.array(action_probs).reshape(45, 45) # map these to a size var
                 action_probs = action_probs * valid_moves  # mask invalid moves
                 action_probs /= np.sum(action_probs)
-                node.expand(next_state, action_probs)
+                node.expand(next_state, action_probs, self.game)
                 # exit()
 
             self.backpropagate(search_path, value)

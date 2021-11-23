@@ -1,9 +1,14 @@
 import numpy as np
-
+from numpy.lib.shape_base import row_stack
+import copy
+import time
 class game:
-    def __init__(self, board):
+    def __init__(self, board, copyBoard, row, col):
         self.board=board
+        self.originalBoard = copyBoard
         self.reset()
+        self.row = row 
+        self.col = col
         self.stateHistory={self.toString():""}
         self.commandHistory=["start"]
         self.commandLookup={"a":"left","w":"up", "s":"down", "d":"right"}
@@ -12,9 +17,17 @@ class game:
         self.person=self.findPerson()
     def getBoard(self):
         return self.board
+    def initBoard(self):
+        print('initBoard called')
+        print(self.originalBoard[:self.row][:self.col])
+        self.board = copy.deepcopy(self.originalBoard)
+        print(self.board[:self.row][:self.col])
+        time.sleep(10)
     def toString(self):
         grid=""
-        for row in self.board:
+        # board = self.board
+        # board = board
+        for row in self.board[:self.row]:
             for entry in row:
                 if entry==0:
                     grid+="■"
@@ -126,9 +139,28 @@ class game:
         if person[0] + 1 == action[0]:
             self.down()
         return self.board
+    def detectLock(self):
+        for i in range(0, self.row):
+            for j in range(0, self.col):
+                if self.board[i][j] == 10:
+                    # bottom left
+                    if self.board[i][j-1] == 0 and self.board[i + 1][j] == 0:
+                        return True
+                    # top right
+                    if self.board[i][j+1] == 0 and self.board[i - 1][j] == 0:
+                        return True
+                    #top left
+                    if self.board[i][j-1] == 0 and self.board[i - 1][j] == 0:
+                        return True
+                    #bottom right
+                    if self.board[i][j+1] == 0 and self.board[i + 1][j] == 0:
+                        return True
+        return False
     def get_reward_for_player(self):
         if self.isWon():
             return 1
+        if self.detectLock():
+            return 0
         else:
             return None # try this out, then try attempts out then try outright returning 0 for loss
     def validCords(self, cords):
@@ -155,6 +187,7 @@ class game:
             return [((cords[0] + 1, cords[1]), (cords[0] - 1, cords[1]), (cords[0], cords[1] - 1))]
         
         #if your in the middle go up down left right
+        # print('returning these')
         return [(cords[0] + 1, cords[1]), (cords[0] - 1, cords[1]), (cords[0], cords[1] + 1), (cords[0], cords[1] - 1)]
     def get_valid_moves(self):
         cords = self.findPerson()
@@ -166,6 +199,17 @@ class game:
         for (x, y) in validMoves:
             newBoard[x][y] = 1
         return newBoard
+    
+    def checkValid(self, move):
+        cords = self.findPerson()
+        if move[0] == cords[0] and move[1] == cords[1]:
+            return True
+        validMoves = self.validCords(cords)
+        for vMove in validMoves:
+            if move[0] == vMove[0] and move[1] == vMove[1]:
+                return True
+
+        return False
         
 
 
