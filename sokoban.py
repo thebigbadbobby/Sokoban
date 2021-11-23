@@ -1,8 +1,8 @@
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras import backend as K
-from tensorflow.keras import layers
-from tensorflow import keras
+# import tensorflow as tf
+# from tensorflow.keras import backend as K
+# from tensorflow.keras import layers
+# from tensorflow import keras
 import random
 import time
 import copy
@@ -10,13 +10,32 @@ from model import *
 from game import game
 from solvesamples import solve_sokoban as solve
 import sys, getopt
+
+import torch
+
+from game import game
+from Network.torchBasic import torchBasic
+from trainer import Trainer
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 #   Wall  = 0
 #   Space = 1
 #   Dot   = 2
 #   Crate = _0
 #   Person= _1
 size = 28
-model=encoder((size, size, 1),4)
+# model=encoder((size, size, 1),4)
+
+
+argsLearn = {
+    'batch_size': 64,
+    'numIters': 500,                                # Total number of training iterations
+    'num_simulations': 100,                         # Total number of MCTS simulations to run when deciding on a move to play
+    'numEps': 100,                                  # Number of full games (episodes) to run during each iteration
+    'numItersForTrainExamplesHistory': 20,
+    'epochs': 2,                                    # Number of epochs of training per iteration
+    'checkpoint_path': 'latest.pth'                 # location to save latest set of weights
+}
 # board=[[1, 1, 0, 0, 0, 0, 0, 1],
 #        [0, 0, 0, 1, 1, 1, 0, 1],
 #        [0, 2,11,10, 1, 1, 0, 1],
@@ -80,9 +99,15 @@ def main(args):
             for j in range(0, col):
                   if (i, j) not in wallCords and board[i][j] ==0:
                         board[i][j] = 1
-      print(board)
-      print(solve(board, model, 3))
-      
+      # print(board)
+      board = encodeboard(board, (size, size))
+      # print(board)
+      sokoban = game(board)
+      board_size = size*size
+      action_size = size*size
+      model = torchBasic(board_size, action_size, device)
+      trainer = Trainer(sokoban, model, argsLearn, size)
+      trainer.learn()
       
 
 

@@ -10,6 +10,8 @@ class game:
         self.heuristics={"isLoop": False, "isWon": False, "numDotsDone": 0, "numMoves":0, "percentSolved": self.percentSolved()}
     def reset(self):
         self.person=self.findPerson()
+    def getBoard(self):
+        return self.board
     def toString(self):
         grid=""
         for row in self.board:
@@ -28,9 +30,14 @@ class game:
         return grid
     def findPerson(self):
         i=0
+        # print(self.board)
         for row in self.board:
             j=0
+            # print('row')
+            # print(row)
             for entry in row:
+                # print('entry')
+                # print(entry)
                 if entry==11 or entry==21:
                     return [i,j]
                 j+=1
@@ -103,9 +110,21 @@ class game:
             
         else: 
             return #False
+        #bruh why are we doing this lol
         self.reset()
 
     # method similar to https://github.com/JoshVarty/AlphaZeroSimple/blob/master/game.py 
+    def get_next_state(self, action):
+        person = self.findPerson()
+        if person[1] - 1 == action[1]:
+            self.left()
+        if person[1] + 1 == action[1]:
+            self.right()
+        if person[0] - 1 == action[0]:
+            self.up()
+        if person[0] + 1 == action[0]:
+            self.down()
+        return self.board
     def get_reward_for_player(self):
         if self.isWon():
             return 1
