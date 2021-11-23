@@ -1,1 +1,2 @@
-Encode board
+Figure out how to turn dictionary values into np array of size, size
+Figure out how to return only the possible moves based off player position

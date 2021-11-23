@@ -112,6 +112,7 @@ class game:
             return #False
         #bruh why are we doing this lol
         self.reset()
+        print(self.toString())
 
     # method similar to https://github.com/JoshVarty/AlphaZeroSimple/blob/master/game.py 
     def get_next_state(self, action):

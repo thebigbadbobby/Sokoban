@@ -58,16 +58,14 @@ class Node:
         best_score = -np.inf
         best_action = -1
         best_child = None
-        # print(self.children.items)
+
         for action, child in self.children.items():
-            print(action)
-            print(child)
             score = ucb_score(self, child)
             if score > best_score:
                 best_score = score
                 best_action = action
                 best_child = child
-        print("best actioN: ", best_action)
+        # print("best_action: ", best_action)
         return best_action, best_child
 
     def expand(self, state, action_probs):
@@ -75,9 +73,14 @@ class Node:
         We expand a node and keep track of the prior policy probability given by neural network
         """
         self.state = state
-        for a, prob in enumerate(action_probs):
+        # print(state)
+        for i in range(0, len(action_probs)):
+            for j in range(0, len(action_probs[i])):
+                prob = action_probs[i][j]
+                # print(prob)
+                # exit()
                 if prob != 0:
-                    self.children[a] = Node(prior = prob)
+                    self.children[(i, j)] = Node(prior = prob)
         # for a, prob in enumerate(action_probs):
         #     if prob != 0:
         #         self.children[a] = Node(prior=prob)
@@ -104,13 +107,13 @@ class MCTS:
         #state needs to be 1xnumofelements array
         action_probs, value = model.predict(state)
         # translate action_probs into a mxn array
-        ogAction_probs = action_probs
+        # ogAction_probs = action_probs
         action_probs = np.array(action_probs).reshape(28, 28)
         # print(ogAction_probs.shape)
         valid_moves = self.game.get_valid_moves() #we know the moves can be up, left, down right so mask based off of position
         action_probs = action_probs * valid_moves  # mask invalid moves
         action_probs /= np.sum(action_probs)
-        root.expand(state, ogAction_probs)
+        root.expand(state, action_probs)
 
         for _ in range(self.args['num_simulations']):
             node = root
@@ -138,11 +141,12 @@ class MCTS:
                 # EXPAND
                 action_probs, value = model.predict(next_state)
                 valid_moves = self.game.get_valid_moves()
-                ogAction_probs = action_probs
+                # ogAction_probs = action_probs
                 action_probs = np.array(action_probs).reshape(28, 28)
                 action_probs = action_probs * valid_moves  # mask invalid moves
                 action_probs /= np.sum(action_probs)
-                node.expand(next_state, ogAction_probs)
+                node.expand(next_state, action_probs)
+                # exit()
 
             self.backpropagate(search_path, value)
 

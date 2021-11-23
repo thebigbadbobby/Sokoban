@@ -29,12 +29,16 @@ class Trainer:
             self.mcts = MCTS(self.game, self.model, self.args)
             root = self.mcts.run(self.model, board)
             # we need to figure out how to 1d the array where I put stuff in that dictionary as 2d array
-            action_probs = {0 for _ in range(self.action_size)}
-            # print(root.children.items)
-            for k, v in root.children.items():
-                print('k')
-                print(k)
-                action_probs[k] = v.visit_count
+            action_probs = [0 for _ in range(self.action_size)]
+            i = 0
+            # print(len(list(root.children.items())))
+            # print('here')
+            # print(type(root.children[(0, 1)]))
+            for k in root.children.keys():
+                # print(type(root.children[k]))
+                # exit()
+                action_probs[i] = root.children[k].visit_count
+                i+=1
 
             action_probs = action_probs / np.sum(action_probs)
             train_examples.append((board, action_probs))
@@ -45,9 +49,9 @@ class Trainer:
 
             if reward is not None:
                 ret = []
-                for hist_state, hist_current_player, hist_action_probs in train_examples:
+                for hist_state, hist_action_probs in train_examples:
                     # [Board, currentPlayer, actionProbabilities, Reward]
-                    ret.append((hist_state, hist_action_probs, reward * ((-1) ** (hist_current_player != current_player))))
+                    ret.append((hist_state, hist_action_probs, reward))
 
                 return ret
 
