@@ -91,8 +91,7 @@ def main(args):
       # print(board)
       # print(game(board).toString())
       print(board)
-      print(solve(board, model, 3))
-      
+      print(solve(board, model, 1000))
       
 
 

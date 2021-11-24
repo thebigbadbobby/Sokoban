@@ -7,6 +7,7 @@ import random
 import time
 import copy
 from inversegame import inversegame
+from game import game
 from model import *
 #   Wall  = 0
 #   Space = 1
@@ -14,6 +15,14 @@ from model import *
 #   Crate = _0
 #   Person= _1
 model=encoder((28, 28, 1),8)
+def add_walls(board, walllist):
+    if len(board)==0:
+        return board
+    for wall in walllist:
+        randnum=random.uniform(0,1)
+        if randnum<.5:
+            board[:,int(wall.replace("[","").replace("]","").replace(",","").split()[0]),int(wall.replace("[","").replace("]","").replace(",","").split()[1])]=0
+    return board
 def place_crates(rows, cols, boxes):
     board=np.random.rand(rows-2,cols-2)
     print(board)
@@ -29,7 +38,7 @@ def place_crates(rows, cols, boxes):
                 board[i][j]=1
     board=np.pad(board, [(1,1),(1,1)])
     return board
-def generate_sokoban(model, rows, cols, boxes):
+def generate_sokoban(model, rows, cols, boxes, ):
     board=place_crates(rows, cols, boxes)
     generated=inversegame(board)
     # print(generated.board)
@@ -42,34 +51,29 @@ def generate_sokoban(model, rows, cols, boxes):
     while generated.heuristics['percentSolved']!=0:
         oldPercentSolved=generated.heuristics['percentSolved']
         # print(oldPercentSolved)
-        print(generated.toString(), index)
+        print(overallHighestState.toString(), index)
         while not generated.heuristics['isLoop']:
             if oldPercentSolved>generated.heuristics['percentSolved']:
                 oldPercentSolved=generated.heuristics['percentSolved']
                 criticalstates[generated.toString()]=copy.deepcopy(generated)
                 if overallPercentSolved>generated.heuristics['percentSolved']:
                     overallPercentSolved=generated.heuristics['percentSolved']
-                    overallHighestState=copy.deepcopy(generated)
+                    overallHighestState=copy.deepcopy(criticalstates[generated.toString()])
+                    print("stamped", overallHighestState.toString())
                 break
             # print(example.toString())
             # print(example.commandHistory)
             action=getActionFromArray(arraySum(model.predict(encodeboard(generated.board, (28,28)))))
             generated.process(action)
+            print("geodude")
             index+=1
-            if index>200:
-                trace(inversegame(board),overallHighestState.commandHistory)
-                print(overallHighestState.toString())
-                print("koffing", overallPercentSolved)
-                print("arbok",overallHighestState.commandHistory)
+            if index>170:
                 return overallHighestState
         # print(example.toString())
         if generated.heuristics['percentSolved']==0:
             break
         generated=copy.deepcopy(random.choice(list(criticalstates.values())))
-    trace(inversegame(board),generated.commandHistory)
-    print(generated.toString())
-    print("koffing")
-    print("arbok",generated.commandHistory)
+    
     return generated
     # while True:
     #     action=getActionFromArray(arraySum(model.predict(encodeboard(generated.board, (28,28)))))
@@ -77,7 +81,20 @@ def generate_sokoban(model, rows, cols, boxes):
     #         break
     #     generated.process(action)
     # return generated
-ekans=generate_sokoban(model, 6, 6, 3)
+
+    # def trainingpak():
+    #     ekans=
+generated=generate_sokoban(model, 6, 6, 3)
+traces=trace(game(generated.board[:]),generated.commandHistory)
+for i in range(0, 5):
+    print("weezing", add_walls(traces[2],traces[0]))
+
+# print(generated.toString())
+# print("koffing")
+# print("arbok",traces[1])
+# print(traces[2])
+    
+# print()
 # while ekans.isWon():
 #     ekans=generate_sokoban(model, 6, 6, 3)
 # print(ekans.board)
