@@ -17,6 +17,7 @@ def solve_sokoban(board, model, maxiter):
             # print(example.commandHistory)
             action=getActionFromArray(arraySum(model.predict(encodeboard(example.board, (28,28)))))
             example.process(action)
+            # print(example.toString(), index)
             index+=1
             if index>maxiter:
                 return -1
@@ -24,7 +25,7 @@ def solve_sokoban(board, model, maxiter):
         if example.heuristics['percentSolved']==1:
             break
         example=copy.deepcopy(random.choice(list(criticalstates.values())))
-    trace(game(board),example.commandHistory)
+    print("weezing",trace(game(board),example.commandHistory))
     print(example.toString())
     print(example.commandHistory)
     return index

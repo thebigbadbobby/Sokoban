@@ -6,6 +6,7 @@ from tensorflow import keras
 import random
 import time
 import copy
+OPPOSITES={"leftPull":"right", "left": "right", "rightPull":"left", "right":"left", "upPull":"down", "up":"down", "downPull": "up", "down":"up"}
 def encodeboard(board, size):
     bigboard=np.zeros(size)
     bigboard[:np.array(board).shape[0],:np.array(board).shape[1]]=np.array(board)
@@ -41,10 +42,21 @@ def getActionFromArray(array):
         return "D"
     return "STOP"
 def trace(game, commandHistory):
-    for command in commandHistory[1:]:
-        print(game.toString())
-        game.process(command)
-    return
+    personset=set()
+    clearset=game.clearSet()
+    boardarray=[]
+    for command in commandHistory[::-1]:
+        if command!='start' and game.isWon()!=True:
+            print(game.toString())
+            a=copy.deepcopy(game.board)
+            boardarray.append(a)
+            game.process(OPPOSITES[command])
+            personset={str(game.findPerson())}|personset
+    if not game.isWon():
+        ekans={}
+        print(np.array(boardarray),clearset.difference(personset|{""}))
+        print(ekans[0])
+    return [clearset.difference(personset|{""}), game.commandHistory[1:], np.array(boardarray)]
 def encoder(input_encoder,size):
     
     inputs = keras.Input(shape=input_encoder, name='input_layer')

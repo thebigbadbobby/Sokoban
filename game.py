@@ -56,6 +56,18 @@ class game:
                     return [i,j]
                 j+=1
             i+=1
+    def clearSet(self):
+        set={''}
+        i=0
+        for row in self.board:
+            j=0
+            for entry in row:
+                if entry==1:
+                    # print(type(set), type({str([i,j])}))
+                    set=set|{str([i,j])}
+                j+=1
+            i+=1
+        return set
     def left(self):
         # print("z")
         # print(self.board[self.person[0]][self.person[1]-1])
