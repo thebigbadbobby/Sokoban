@@ -15,8 +15,8 @@ class torchBasic(nn.Module):
         self.size = board_size
         self.action_size = action_size
         
-        self.fc1 = nn.Linear(in_features=self.size, out_features=board_size*4)
-        self.fc2 = nn.Linear(in_features=board_size*4, out_features=board_size*4)
+        self.fc1 = nn.Linear(in_features=self.size, out_features=board_size*2)
+        self.fc2 = nn.Linear(in_features=board_size*2, out_features=board_size*4)
 
         # Two heads on our network
         self.action_head = nn.Linear(in_features=board_size*4, out_features=self.action_size)

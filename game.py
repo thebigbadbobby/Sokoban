@@ -19,10 +19,11 @@ class game:
         return self.board
     def initBoard(self):
         print('initBoard called')
-        print(self.originalBoard[:self.row][:self.col])
+        # print(self.originalBoard[:self.row][:self.col])
+        self.board = 0
         self.board = copy.deepcopy(self.originalBoard)
-        print(self.board[:self.row][:self.col])
-        time.sleep(10)
+        # print(self.board[:self.row][:self.col])
+        # time.sleep(10)
     def toString(self):
         grid=""
         # board = self.board
@@ -95,7 +96,15 @@ class game:
         #     print(self.board[self.person[0]][self.person[1]],self.board[self.person[0]][self.person[1]+1] )
         # self.reset()
         self.move(self.person, [self.person[0]-1,self.person[1]])
-
+    def checkDouble(self):
+        count = 0
+        for i in range(0, self.row):
+            for j in range(0, self.col):
+                if self.board[i][j] == 11:
+                    count += 1
+        if count > 1:
+            print("THIS IS BAD")
+            exit()
     def move(self, start, end, isperson=True):
         # print("z")
         # print(self.board[start[0]][start[1]])
@@ -125,6 +134,7 @@ class game:
             return #False
         #bruh why are we doing this lol
         self.reset()
+        self.checkDouble()
         print(self.toString())
 
     # method similar to https://github.com/JoshVarty/AlphaZeroSimple/blob/master/game.py 

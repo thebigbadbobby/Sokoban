@@ -6,12 +6,15 @@ import torch
 import torch.optim as optim
 
 from MonteCarlo.BasicMonte import MCTS
-import game as game
+from game import game as Game
 import copy
 class Trainer:
 
-    def __init__(self, game, model, args, size):
-        self.game = game
+    def __init__(self, board, model, args, size, row, col):
+        self.board = board
+        self.row = row 
+        self.col = col 
+        self.game = Game(self.board, self.board, self.row, self.col)
         self.model = model
         self.args = args
         self.size = size
@@ -21,7 +24,8 @@ class Trainer:
     def exceute_episode(self):
 
         train_examples = []
-        self.game.initBoard()
+        copyBoard = copy.deepcopy(self.board)
+        self.game = Game(copyBoard, copyBoard, self.row, self.col)
 
         while True:
             board = np.ndarray.flatten(self.game.getBoard())
@@ -58,6 +62,9 @@ class Trainer:
             train_examples = []
             for eps in range(self.args['numEps']):
                 print('eps #: ', eps)
+                print('new eps here')
+                print('dsalkfasdlkfa;sfasfd')
+                print('ldsfakdsfdsa')
                 iteration_train_examples = self.exceute_episode()
                 train_examples.extend(iteration_train_examples)
 

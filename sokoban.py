@@ -112,7 +112,7 @@ def main(args):
       board_size = size*size
       action_size = size*size
       model = torchBasic(board_size, action_size, device)
-      trainer = Trainer(sokoban, model, argsLearn, size)
+      trainer = Trainer(board, model, argsLearn, size, row, col)
       trainer.learn()
       
 
