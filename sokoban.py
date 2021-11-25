@@ -15,6 +15,7 @@ import torch
 
 from game import game
 from Network.torchBasic import torchBasic
+from Network.betterNN import betterNN
 from trainer import Trainer
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

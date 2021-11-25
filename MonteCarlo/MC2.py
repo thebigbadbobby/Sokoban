@@ -13,10 +13,10 @@ class MCTS():
         self.Qsa = {}       # stores Q values for s,a (as defined in the paper)
         self.Nsa = {}       # stores #times edge s,a was visited
         self.Ns = {}        # stores #times board s was visited
-        self.Ps = {}        # stores initial policy (returned by neural net)
+        self.Ps = {}        # stores initial policy (returned by neural net) this is a 1xboardsize*boardsize array
 
         self.Es = {}        # stores game.getGameEnded ended for board s
-        self.Vs = {}        # stores game.getValidMoves for board s
+        self.Vs = {}        # stores game.getValidMoves for board s make this store 2d arrays with the key being the action coordinates
 
     def getActionProb(self, canonicalBoard, temp=1):
         """
@@ -60,7 +60,7 @@ class MCTS():
         s = self.game.string_representation(canonicalBoard)
 
         if s not in self.Es:
-            self.Es[s] = self.game.has_puzzle_ended(canonicalBoard)
+            self.Es[s] = self.game.get_reward_for_player()
         if self.Es[s] != 0 or depth > sys.getrecursionlimit() - 100:
             # terminal node
             return -self.Es[s]
@@ -68,8 +68,11 @@ class MCTS():
         if s not in self.Ps:
             # leaf node
             self.Ps[s], v = self.nnet.predict(canonicalBoard)
-            valids = self.game.get_valid_moves(canonicalBoard)
-            self.Ps[s] = self.Ps[s] * valids      # masking invalid moves
+            action_probs = np.array(self.Ps[s]).reshape(self.row, self.col)
+            valids = self.game.get_valid_moves()
+            action_probs *= valids
+            action_probs = np.ndarray.flatten(action_probs)
+            self.Ps[s] = action_probs     # masking invalid moves
             sum_Ps_s = np.sum(self.Ps[s])
             if sum_Ps_s > 0:
                 self.Ps[s] /= sum_Ps_s    # renormalize
@@ -91,6 +94,8 @@ class MCTS():
         best_act = -1
 
         # pick the action with the highest upper confidence bound
+        # implement get_action_size, figure some cpuct value 
+        # convert this into a 
         for a in range(self.game.get_action_size()):
             if valids[a]:
                 if (s, a) in self.Qsa:

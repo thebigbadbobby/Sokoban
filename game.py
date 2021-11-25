@@ -15,6 +15,10 @@ class game:
         self.person=self.findPerson()
     def getBoard(self):
         return self.board
+    def string_representation(self):
+        return np.array_str(self.board)
+    def get_action_size(self):
+        return self.board.shape[0] * self.board.shape[1]
     def toString(self):
         grid=""
         # board = self.board
