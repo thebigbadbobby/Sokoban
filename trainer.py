@@ -10,26 +10,27 @@ from game import game as Game
 import copy
 class Trainer:
 
-    def __init__(self, board, model, args, size, row, col):
+    def __init__(self, board, model, args, size, row, col, maxrow, maxcol):
         self.board = board
         self.row = row 
         self.col = col 
-        self.game = Game(self.board, self.board, self.row, self.col)
+        self.maxrow = maxrow
+        self.maxcol = maxcol
+        self.game = Game(self.board, row, col)
         self.model = model
         self.args = args
-        self.size = size
-        self.action_size = size*size
-        self.mcts = MCTS(self.game, self.model, self.args)
+        self.action_size = size
+        self.mcts = MCTS(self.game, self.model, self.args, maxrow, maxcol)
 
     def exceute_episode(self):
 
         train_examples = []
         copyBoard = copy.deepcopy(self.board)
-        self.game = Game(copyBoard, copyBoard, self.row, self.col)
+        self.game = Game(copyBoard, self.row, self.col)
 
         while True:
             board = np.ndarray.flatten(self.game.getBoard())
-            self.mcts = MCTS(self.game, self.model, self.args)
+            self.mcts = MCTS(self.game, self.model, self.args, self.maxrow, self.maxcol)
             root = self.mcts.run(self.model, board)
             action_probs = [0 for _ in range(self.action_size)]
             i = 0
@@ -77,12 +78,14 @@ class Trainer:
         optimizer = optim.Adam(self.model.parameters(), lr=5e-4)
         pi_losses = []
         v_losses = []
-
+        print(examples)
         for epoch in range(self.args['epochs']):
             self.model.train()
 
             batch_idx = 0
-
+            print('here')
+            print(len(examples))
+            print(int(len(examples) / self.args['batch_size']))
             while batch_idx < int(len(examples) / self.args['batch_size']):
                 sample_ids = np.random.randint(len(examples), size=self.args['batch_size'])
                 boards, pis, vs = list(zip(*[examples[i] for i in sample_ids]))

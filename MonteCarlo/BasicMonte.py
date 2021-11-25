@@ -110,10 +110,12 @@ class Node:
 
 class MCTS:
 
-    def __init__(self, game, model, args):
+    def __init__(self, game, model, args, row, col):
         self.game = game
         self.model = model
         self.args = args
+        self.row = row
+        self.col = col
 
     def run(self, model, state):
 
@@ -124,7 +126,7 @@ class MCTS:
         action_probs, value = model.predict(state)
         # translate action_probs into a mxn array
         # ogAction_probs = action_probs
-        action_probs = np.array(action_probs).reshape(45, 45) # map these to a size var
+        action_probs = np.array(action_probs).reshape(self.row, self.col) # map these to a size var
         # print(ogAction_probs.shape)
         valid_moves = self.game.get_valid_moves() #we know the moves can be up, left, down right so mask based off of position
         action_probs = action_probs * valid_moves  # mask invalid moves
@@ -132,7 +134,6 @@ class MCTS:
         root.expand(state, action_probs, self.game)
 
         for i in range(self.args['num_simulations']):
-            print("i: ", i)
             node = root
             search_path = [node]
 
@@ -158,7 +159,7 @@ class MCTS:
                 action_probs, value = model.predict(next_state)
                 valid_moves = self.game.get_valid_moves()
                 # ogAction_probs = action_probs
-                action_probs = np.array(action_probs).reshape(45, 45) # map these to a size var
+                action_probs = np.array(action_probs).reshape(self.row, self.col) # map these to a size var
                 action_probs = action_probs * valid_moves  # mask invalid moves
                 action_probs /= np.sum(action_probs)
                 node.expand(next_state, action_probs, self.game)

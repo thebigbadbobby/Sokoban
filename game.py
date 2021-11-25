@@ -1,11 +1,9 @@
 import numpy as np
-from numpy.lib.shape_base import row_stack
 import copy
 import time
 class game:
-    def __init__(self, board, copyBoard, row, col):
+    def __init__(self, board, row, col):
         self.board=board
-        self.originalBoard = copyBoard
         self.reset()
         self.row = row 
         self.col = col
@@ -17,13 +15,6 @@ class game:
         self.person=self.findPerson()
     def getBoard(self):
         return self.board
-    def initBoard(self):
-        print('initBoard called')
-        # print(self.originalBoard[:self.row][:self.col])
-        self.board = 0
-        self.board = copy.deepcopy(self.originalBoard)
-        # print(self.board[:self.row][:self.col])
-        # time.sleep(10)
     def toString(self):
         grid=""
         # board = self.board
@@ -146,7 +137,7 @@ class game:
             return #False
         #bruh why are we doing this lol
         self.reset()
-        self.checkDouble()
+        # self.checkDouble()
         print(self.toString())
 
     # method similar to https://github.com/JoshVarty/AlphaZeroSimple/blob/master/game.py 
