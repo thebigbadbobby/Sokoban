@@ -27,8 +27,9 @@ class Trainer:
         train_examples = []
         copyBoard = copy.deepcopy(self.board)
         self.game = Game(copyBoard, self.row, self.col)
-
+        exec_loop = 0
         while True:
+            print("exec_loop#: ", exec_loop)
             board = np.ndarray.flatten(self.game.getBoard())
             self.mcts = MCTS(self.game, self.model, self.args, self.maxrow, self.maxcol)
             root = self.mcts.run(self.model, board)
@@ -44,9 +45,11 @@ class Trainer:
             train_examples.append((board, action_probs))
 
             action = root.select_action(temperature=0)
+            print(action)
             state = self.game.get_next_state(action)
             reward = self.game.get_reward_for_player()
-
+            if exec_loop > 49 and not reward:
+                reward = 0
             if reward is not None:
                 ret = []
                 for hist_state, hist_action_probs in train_examples:
@@ -54,6 +57,7 @@ class Trainer:
                     ret.append((hist_state, hist_action_probs, reward))
 
                 return ret
+            exec_loop += 1
 
     def learn(self):
         for i in range(1, self.args['numIters'] + 1):
@@ -133,6 +137,4 @@ class Trainer:
             os.mkdir(folder)
 
         filepath = os.path.join(folder, filename)
-        torch.save({
-            'state_dict': self.model.state_dict(),
-        }, filepath)
+        torch.save(self.model.state_dict(), filepath)

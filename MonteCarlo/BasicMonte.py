@@ -68,7 +68,7 @@ class Node:
                 best_action = action
                 best_child = child
         if not best_child:
-            # print('wee woo')
+            print('wee woo invalid')
             # print()
             # print('not bsts child')
             for action, child in self.children.items():
@@ -133,7 +133,7 @@ class MCTS:
         action_probs /= np.sum(action_probs)
         root.expand(state, action_probs, self.game)
 
-        for i in range(self.args['num_simulations']):
+        for _ in range(self.args['num_simulations']):
             node = root
             search_path = [node]
 

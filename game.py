@@ -163,14 +163,38 @@ class game:
                     # bottom left
                     if self.board[i][j-1] == 0 and self.board[i + 1][j] == 0:
                         return True
+                    if self.board[i][j-1] == 20 and self.board[i + 1][j] == 0:
+                        return True
+                    if self.board[i][j-1] == 0 and self.board[i + 1][j] == 20:
+                        return True
+                    if self.board[i][j-1] == 20 and self.board[i + 1][j] == 20:
+                        return True
                     # top right
                     if self.board[i][j+1] == 0 and self.board[i - 1][j] == 0:
+                        return True
+                    if self.board[i][j+1] == 20 and self.board[i - 1][j] == 0:
+                        return True
+                    if self.board[i][j+1] == 0 and self.board[i - 1][j] == 20:
+                        return True
+                    if self.board[i][j+1] == 20 and self.board[i - 1][j] == 20:
                         return True
                     #top left
                     if self.board[i][j-1] == 0 and self.board[i - 1][j] == 0:
                         return True
+                    if self.board[i][j-1] == 20 and self.board[i - 1][j] == 0:
+                        return True
+                    if self.board[i][j-1] == 0 and self.board[i - 1][j] == 20:
+                        return True
+                    if self.board[i][j-1] == 20 and self.board[i - 1][j] == 20:
+                        return True
                     #bottom right
                     if self.board[i][j+1] == 0 and self.board[i + 1][j] == 0:
+                        return True
+                    if self.board[i][j+1] == 20 and self.board[i + 1][j] == 0:
+                        return True
+                    if self.board[i][j+1] == 0 and self.board[i + 1][j] == 20:
+                        return True
+                    if self.board[i][j+1] == 20 and self.board[i + 1][j] == 20:
                         return True
         return False
     def get_reward_for_player(self):
