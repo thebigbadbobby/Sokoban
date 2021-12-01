@@ -147,15 +147,20 @@ class game:
     # method similar to https://github.com/JoshVarty/AlphaZeroSimple/blob/master/game.py 
     def get_next_state(self, action):
         person = self.findPerson()
+        move = ""
         if person[1] - 1 == action[1]:
             self.left()
+            move = "L"
         if person[1] + 1 == action[1]:
             self.right()
+            move = "R"
         if person[0] - 1 == action[0]:
             self.up()
+            move =  "U"
         if person[0] + 1 == action[0]:
             self.down()
-        return self.board
+            move =  "D"
+        return self.board, move
     def detectLock(self):
         for i in range(0, self.row):
             for j in range(0, self.col):

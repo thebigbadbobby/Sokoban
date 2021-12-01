@@ -148,7 +148,7 @@ class MCTS:
             state = parent.state
             # Now we're at a leaf node and we would like to expand
             # Players always play from their own perspective
-            next_state = self.game.get_next_state(action)
+            next_state, _ = self.game.get_next_state(action)
             # print(next_state)
             # The value of the new state from the perspective of the other player
             value = self.game.get_reward_for_player() # a function that determines if we finished or 
