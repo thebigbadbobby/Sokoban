@@ -152,7 +152,7 @@ class inversegame:
     def process(self, awsd):
         personcoords=self.findPerson()
         commandMethod = getattr(self, self.lookupCommand(awsd))
-        print("command:", self.lookupCommand(awsd))
+        # print("command:", self.lookupCommand(awsd))
         commandMethod()
         if self.findPerson!=personcoords:
             self.commandHistory.append(self.lookupCommand(awsd))
