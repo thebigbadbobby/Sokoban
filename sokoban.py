@@ -63,7 +63,7 @@ board=np.array([[0, 0, 0, 0],
 
 def main(args):
       x = str(datetime.datetime.now())
-      fname = 'error-' + x + '.txt'
+      fname = 'error-' + x + '.csv'
       fp = open(fname, 'x')
       fp.close()
       # row, col = 0, 0
