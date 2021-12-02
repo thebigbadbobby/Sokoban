@@ -170,7 +170,6 @@ class MCTS:
             next_state = self.game.get_next_state(action, state)
             # The value of the new state from the perspective of the other player
             value = self.game.get_reward_for_player(state) # a function that determines if we finished or 
-            print(value)
             if value is None:
                 # If the game has not ended:
                 # EXPAND

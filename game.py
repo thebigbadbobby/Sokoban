@@ -25,6 +25,7 @@ class game:
         grid=""
         # board = self.board
         # board = board
+        state = np.array(state).reshape(self.maxrow, self.maxcol)
         for row in state[:self.row]:
             for entry in row:
                 if entry==0:
@@ -96,8 +97,8 @@ class game:
         # state = np.array(state).reshape(self.maxrow, self.maxcol)
         # state = state[:self.row][:self.col]
         state = np.array(state).reshape(self.maxrow, self.maxcol)
-        print('before')
-        print(self.toString(state))
+        # print('before')
+        # print(self.toString(state))
         startvalue=state[start[0]][start[1]]
         endvalue=state[end[0]][end[1]]
         if endvalue==10 or endvalue==20:
@@ -124,27 +125,30 @@ class game:
             # print(startvalue,endvalue)
         else:
             #if can't move cuz of box
-            print('after give up moving')
-            print(self.toString(state))
+            # print(self.toString(state))
             return np.ndarray.flatten(state)
-        print('after')
-        print(self.toString(state))
+        # print('after')
+        # print(self.toString(state))
         return np.ndarray.flatten(state)
 
     # method similar to https://github.com/JoshVarty/AlphaZeroSimple/blob/master/game.py 
-    def get_next_state(self, action, state):
+    def get_next_state(self, action, state,trainerMove=False):
         person = self.findPerson(state)
         if person[1] - 1 == action[1]:
-            print('left')
+            if trainerMove:
+                print('left')
             return self.left(person, state)
         if person[1] + 1 == action[1]:
-            print('right')
+            if trainerMove:
+                print('right')
             return self.right(person, state)
         if person[0] - 1 == action[0]:
-            print('up')
+            if trainerMove:
+                print('up')
             return self.up(person, state)
         if person[0] + 1 == action[0]:
-            print('down')
+            if trainerMove:
+                print('down')
             return self.down(person, state)
     def detectLock(self, state):
         state = np.array(state).reshape(self.maxrow, self.maxcol)

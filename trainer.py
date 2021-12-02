@@ -30,9 +30,11 @@ class Trainer:
         self.game = Game(copyBoard, self.row, self.col, self.maxrow, self.maxcol)
         exec_loop = 0
         state = self.game.getBoard()
+        print('init board')
+        print(self.game.toString(state))
         while True:
             print("exec_loop#: ", exec_loop)
-            time.sleep(5)
+            # time.sleep(5)
             board = np.ndarray.flatten(state)
             self.mcts = MCTS(self.game, self.model, self.args, self.maxrow, self.maxcol, self.row, self.col)
             root = self.mcts.run(self.model, board)
@@ -49,11 +51,14 @@ class Trainer:
 
             action = root.select_action(temperature=0)
             print(action)
+            print('GETTING DA MOVE')
             #maybe get action URLD from next state?
-            state = self.game.get_next_state(action, state)
+            state = self.game.get_next_state(action, state, True)
+            print('state after move')
+            print(self.game.toString(state))
             reward = self.game.get_reward_for_player(state)
-            # if exec_loop > 49 and not reward:
-            #     reward = 0
+            if exec_loop > self.args['loopStop'] and not reward:
+                reward = 0
             if reward is not None:
                 ret = []
                 for hist_state, hist_action_probs in train_examples:
