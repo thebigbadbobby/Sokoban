@@ -11,7 +11,7 @@ import copy
 
 class Trainer:
 
-    def __init__(self, board, model, args, size, row, col, maxrow, maxcol):
+    def __init__(self, board, model, args, size, row, col, maxrow, maxcol, fname):
         self.board = board
         self.row = row 
         self.col = col 
@@ -22,6 +22,7 @@ class Trainer:
         self.args = args
         self.action_size = size
         self.mcts = MCTS(self.game, self.model, self.args, maxrow, maxcol, row, col)
+        self.fname = fname
 
     def execute_episode(self):
 
@@ -83,11 +84,11 @@ class Trainer:
                 train_examples.extend(iteration_train_examples)
 
             shuffle(train_examples)
-            self.train(train_examples)
+            self.train(train_examples, i)
             filename = self.args['checkpoint_path']
             self.save_checkpoint(folder=".", filename=filename)
 
-    def train(self, examples):
+    def train(self, examples, iteration):
         optimizer = optim.Adam(self.model.parameters(), lr=5e-4)
         pi_losses = []
         v_losses = []
@@ -121,7 +122,15 @@ class Trainer:
                 optimizer.step()
 
                 batch_idx += 1
-
+            file1 = open(self.fname, "a")  # append mode
+            file1.write(str(iteration) + ",")
+            file1.write(str(epoch) + ",")
+            file1.write(str(np.format_float_positional(np.mean(pi_losses)) + ","))
+            file1.write(str(np.format_float_positional(np.mean(v_losses))) + "\n")
+            # file1.write("Examples:")
+            # file1.write(out_pi[0].detach())
+            # file1.write(target_pis[0])
+            file1.close()
             print()
             print("Policy Loss", np.mean(pi_losses))
             print("Value Loss", np.mean(v_losses))

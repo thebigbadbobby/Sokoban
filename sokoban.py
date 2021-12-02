@@ -10,6 +10,7 @@ from model import *
 from game import game
 from solvesamples import solve_sokoban as solve
 import sys, getopt
+import datetime
 
 import torch
 
@@ -32,14 +33,14 @@ maxsize = maxrow * maxcol
 
 
 argsLearn = {
-    'batch_size': 64,
+    'batch_size': 1,
     'numIters': 100,                                # Total number of training iterations
-    'num_simulations': 500,                         # Total number of MCTS simulations to run when deciding on a move to play
-    'numEps': 100,                                  # Number of full games (episodes) to run during each iteration
+    'num_simulations': 20,                         # Total number of MCTS simulations to run when deciding on a move to play
+    'numEps': 2,                                  # Number of full games (episodes) to run during each iteration
     'numItersForTrainExamplesHistory': 20,
     'epochs': 2,                                    # Number of epochs of training per iteration
     'checkpoint_path': 'latest.pth',                 # location to save latest set of weights
-    'loopStop': 100                                   #stop it from going into infinite loops
+    'loopStop': 1                                   #stop it from going into infinite loops
 }
 # board=[[1, 1, 0, 0, 0, 0, 0, 1],
 #        [0, 0, 0, 1, 1, 1, 0, 1],
@@ -61,6 +62,10 @@ board=np.array([[0, 0, 0, 0],
 
 
 def main(args):
+      x = str(datetime.datetime.now())
+      fname = 'error-' + x + '.txt'
+      fp = open(fname, 'x')
+      fp.close()
       # row, col = 0, 0
       # numWall = 0
       # wallCords = []
@@ -131,7 +136,7 @@ def main(args):
       if len(args) > 1:
             model.load_state_dict(torch.load(args[1]))
       # exit()
-      trainer = Trainer(board, model, argsLearn, maxsize, row, col, maxrow, maxcol)
+      trainer = Trainer(board, model, argsLearn, maxsize, row, col, maxrow, maxcol, fname)
       
       trainer.learn()
       

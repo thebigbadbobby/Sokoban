@@ -10,7 +10,7 @@ OPPOSITES={"leftPull":"right", "left": "right", "rightPull":"left", "right":"lef
 def encodeboard(board, size):
     bigboard=np.zeros(size)
     bigboard[:np.array(board).shape[0],:np.array(board).shape[1]]=np.array(board)
-    
+    return bigboard
     return bigboard.reshape(1,28,28, 1)
 def arraySum(array):
     sums=0
