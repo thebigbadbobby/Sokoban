@@ -11,7 +11,7 @@ def encodeboard(board, size):
     bigboard=np.zeros(size)
     bigboard[:np.array(board).shape[0],:np.array(board).shape[1]]=np.array(board)
     
-    return bigboard
+    return bigboard.reshape(1,28,28, 1)
 def arraySum(array):
     sums=0
     for i in range(0,len(array[0])):
@@ -47,7 +47,7 @@ def trace(game, commandHistory):
     boardarray=[]
     for command in commandHistory[::-1]:
         if command!='start' and game.isWon()!=True:
-            print(game.toString())
+            # print(game.toString())
             a=copy.deepcopy(game.board)
             boardarray.append(a)
             game.process(OPPOSITES[command])
@@ -55,7 +55,7 @@ def trace(game, commandHistory):
     if not game.isWon():
         ekans={}
         print(np.array(boardarray),clearset.difference(personset|{""}))
-        print(ekans[0])
+        print("aaaaaa",ekans[0])
     return [clearset.difference(personset|{""}), game.commandHistory[1:], np.array(boardarray)]
 def encoder(input_encoder,size):
     

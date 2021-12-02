@@ -23,7 +23,7 @@ class Trainer:
         self.action_size = size
         self.mcts = MCTS(self.game, self.model, self.args, maxrow, maxcol, row, col)
 
-    def exceute_episode(self):
+    def execute_episode(self):
 
         train_examples = []
         copyBoard = copy.deepcopy(self.board)
@@ -79,7 +79,7 @@ class Trainer:
                 print('new eps here')
                 print('dsalkfasdlkfa;sfasfd')
                 print('ldsfakdsfdsa')
-                iteration_train_examples = self.exceute_episode()
+                iteration_train_examples = self.execute_episode()
                 train_examples.extend(iteration_train_examples)
 
             shuffle(train_examples)
