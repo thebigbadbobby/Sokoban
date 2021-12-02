@@ -1,35 +1,42 @@
 import os
 import numpy as np
 from random import shuffle
-
+import time
 import torch
 import torch.optim as optim
 
 from MonteCarlo.BasicMonte import MCTS
 from game import game as Game
 import copy
+
 class Trainer:
 
-    def __init__(self, board, model, args, size, row, col):
+    def __init__(self, board, model, args, size, row, col, maxrow, maxcol):
         self.board = board
         self.row = row 
         self.col = col 
-        self.game = Game(self.board, self.board, self.row, self.col)
+        self.maxrow = maxrow
+        self.maxcol = maxcol
+        self.game = Game(self.board, row, col, maxrow, maxcol)
         self.model = model
         self.args = args
-        self.size = size
-        self.action_size = size*size
-        self.mcts = MCTS(self.game, self.model, self.args)
+        self.action_size = size
+        self.mcts = MCTS(self.game, self.model, self.args, maxrow, maxcol, row, col)
 
     def execute_episode(self):
 
         train_examples = []
         copyBoard = copy.deepcopy(self.board)
-        self.game = Game(copyBoard, copyBoard, self.row, self.col)
-
+        self.game = Game(copyBoard, self.row, self.col, self.maxrow, self.maxcol)
+        exec_loop = 0
+        state = self.game.getBoard()
+        print('init board')
+        print(self.game.toString(state))
         while True:
-            board = np.ndarray.flatten(self.game.getBoard())
-            self.mcts = MCTS(self.game, self.model, self.args)
+            print("exec_loop#: ", exec_loop)
+            # time.sleep(5)
+            board = np.ndarray.flatten(state)
+            self.mcts = MCTS(self.game, self.model, self.args, self.maxrow, self.maxcol, self.row, self.col)
             root = self.mcts.run(self.model, board)
             action_probs = [0 for _ in range(self.action_size)]
             i = 0
@@ -43,9 +50,15 @@ class Trainer:
             train_examples.append((board, action_probs))
 
             action = root.select_action(temperature=0)
-            state = self.game.get_next_state(action)
-            reward = self.game.get_reward_for_player()
-
+            print(action)
+            print('GETTING DA MOVE')
+            #maybe get action URLD from next state?
+            state = self.game.get_next_state(action, state, True)
+            print('state after move')
+            print(self.game.toString(state))
+            reward = self.game.get_reward_for_player(state)
+            if exec_loop > self.args['loopStop'] and not reward:
+                reward = 0
             if reward is not None:
                 ret = []
                 for hist_state, hist_action_probs in train_examples:
@@ -53,6 +66,7 @@ class Trainer:
                     ret.append((hist_state, hist_action_probs, reward))
 
                 return ret
+            exec_loop += 1
 
     def learn(self):
         for i in range(1, self.args['numIters'] + 1):
@@ -77,12 +91,10 @@ class Trainer:
         optimizer = optim.Adam(self.model.parameters(), lr=5e-4)
         pi_losses = []
         v_losses = []
-
         for epoch in range(self.args['epochs']):
             self.model.train()
 
             batch_idx = 0
-
             while batch_idx < int(len(examples) / self.args['batch_size']):
                 sample_ids = np.random.randint(len(examples), size=self.args['batch_size'])
                 boards, pis, vs = list(zip(*[examples[i] for i in sample_ids]))
@@ -130,6 +142,4 @@ class Trainer:
             os.mkdir(folder)
 
         filepath = os.path.join(folder, filename)
-        torch.save({
-            'state_dict': self.model.state_dict(),
-        }, filepath)
+        torch.save(self.model.state_dict(), filepath)
