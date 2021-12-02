@@ -139,7 +139,7 @@ class MCTS:
         self.actualCol = actualCol
 
     def run(self, model, state):
-
+        print(np.shape(state))
         root = Node(0)
 
         # EXPAND root

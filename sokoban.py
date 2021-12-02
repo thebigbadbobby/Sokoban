@@ -132,7 +132,7 @@ def main(args):
       # exit()
       board_size = maxsize
       action_size = maxsize
-      model = torchBasic(board_size, action_size, device)
+      model = betterNN(board_size, action_size, device, maxrow, maxcol)
       if len(args) > 1:
             model.load_state_dict(torch.load(args[1]))
       # exit()

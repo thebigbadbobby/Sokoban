@@ -102,7 +102,6 @@ class Trainer:
                 boards = torch.FloatTensor(np.array(boards).astype(np.float64))
                 target_pis = torch.FloatTensor(np.array(pis))
                 target_vs = torch.FloatTensor(np.array(vs).astype(np.float64))
-
                 # predict
                 boards = boards.contiguous().cuda()
                 target_pis = target_pis.contiguous().cuda()

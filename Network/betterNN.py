@@ -8,15 +8,17 @@ import torch.nn.functional as F
 
 class betterNN(nn.Module):
 
-    def __init__(self, board_size, action_size, device):
+    def __init__(self, board_size, action_size, device, rows, columns):
 
         super(betterNN, self).__init__()
 
         self.device = device
         self.size = board_size
         self.action_size = action_size
-        
-        self.conv_1 = nn.Conv2d(in_channels=self.size, out_channels=board_size*2, kernel_size=1)
+        self.maxrow=rows
+        self.maxcol=columns
+        print(type(rows))
+        self.conv_1 = nn.Conv2d(in_channels=rows, out_channels=columns, kernel_size=1)
         self.bn_1 = nn.BatchNorm2d(board_size*2)
         self.conv_2 = nn.Conv2d(in_channels=board_size*2, out_channels=board_size*4, kernel_size=1, stride=1, padding='same')
         self.bn_2  = nn.BatchNorm2d(board_size*4)
@@ -30,6 +32,9 @@ class betterNN(nn.Module):
         self.to(device)
 
     def forward(self, x):
+        x=np.array(x).reshape(self.maxrow, self.maxcol)
+        print(x)
+        print(self.conv_1(x))
         x = F.relu(self.bn_1(self.conv_1(x)))
         x = F.relu(self.bn_2(self.conv_2(x)))
         x = F.relu(self.bn_3(self.conv_3(x)))

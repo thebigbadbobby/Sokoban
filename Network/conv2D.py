@@ -1,15 +1,11 @@
-import numpy as np
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-
-class torchBasic(nn.Module):
-
+import numpy as np
+class conv2D(nn.Module):
     def __init__(self, board_size, action_size, device):
 
-        super(torchBasic, self).__init__()
+        super(conv2D, self).__init__()
 
         self.device = device
         self.size = board_size
