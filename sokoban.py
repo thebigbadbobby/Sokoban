@@ -121,8 +121,8 @@ def main(args):
       # print(board)
       board = encodeboard(board, (maxrow, maxcol))
       # print(board)
-      sokoban = game(board, row, col)
-      print(sokoban.toString())
+      sokoban = game(board, row, col, maxrow, maxcol)
+      # print(sokoban.toString())
       # exit()
       board_size = maxsize
       action_size = maxsize

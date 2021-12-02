@@ -2,28 +2,30 @@ import numpy as np
 import copy
 import time
 class game:
-    def __init__(self, board, row, col):
+    def __init__(self, board, row, col, maxrow, maxcol):
         self.board=board
-        self.reset()
+        # self.reset()
         self.row = row 
         self.col = col
-        self.stateHistory={self.toString():""}
+        self.maxrow = maxrow
+        self.maxcol = maxcol
+        # self.stateHistory={self.toString():""}
         self.commandHistory=["start"]
         self.commandLookup={"a":"left","w":"up", "s":"down", "d":"right"}
         self.heuristics={"isLoop": False, "isWon": False, "numDotsDone": 0, "numMoves":0, "percentSolved": self.percentSolved()}
-    def reset(self):
-        self.person=self.findPerson()
+    # def reset(self):
+    #     self.person=self.findPerson()
     def getBoard(self):
         return self.board
     def string_representation(self):
         return np.array_str(self.board)
     def get_action_size(self):
         return self.board.shape[0] * self.board.shape[1]
-    def toString(self):
+    def toString(self, state):
         grid=""
         # board = self.board
         # board = board
-        for row in self.board[:self.row]:
+        for row in state[:self.row]:
             for entry in row:
                 if entry==0:
                     grid+="■"
@@ -37,10 +39,13 @@ class game:
                     grid+="☆"
             grid+="\n"
         return grid
-    def findPerson(self):
+    def findPerson(self, state):
+        # state = state[:self.maxrow*self.maxcol]
         i=0
         # print(self.board)
-        for row in self.board:
+        state = np.array(state).reshape(self.maxrow, self.maxcol)
+        state = state[:self.row][:self.col]
+        for row in state:
             j=0
             # print('row')
             # print(row)
@@ -63,46 +68,19 @@ class game:
                 j+=1
             i+=1
         return set
-    def left(self):
-        # print("z")
-        # print(self.board[self.person[0]][self.person[1]-1])
-        # if self.board[self.person[0]][self.person[1]-1]!=0 and self.board[self.person[0]][self.person[1]-1]<10:
-        #     print("a")
-        #     self.board[self.person[0]][self.person[1]]=int((self.board[self.person[0]][self.person[1]]-self.board[self.person[0]][self.person[1]]%10)/10)
-        #     self.board[self.person[0]][self.person[1]-1]=self.board[self.person[0]][self.person[1]-1]*10+1
-        #     print(self.board[self.person[0]][self.person[1]],self.board[self.person[0]][self.person[1]-1] )
-        # self.reset()
-        self.move(self.person, [self.person[0],self.person[1]-1])
-    def right(self):
-        # print("z")
-        # print(self.board[self.person[0]][self.person[1]+1])
-        # if self.board[self.person[0]][self.person[1]+1]!=0 and self.board[self.person[0]][self.person[1]+1]<10:
-        #     print("a")
-        #     self.board[self.person[0]][self.person[1]]=int((self.board[self.person[0]][self.person[1]]-self.board[self.person[0]][self.person[1]]%10)/10)
-        #     self.board[self.person[0]][self.person[1]+1]=self.board[self.person[0]][self.person[1]+1]*10+1
-        #     print(self.board[self.person[0]][self.person[1]],self.board[self.person[0]][self.person[1]+1] )
-        # self.reset()
-        self.move(self.person, [self.person[0],self.person[1]+1])
-    def down(self):
-        # print("z")
-        # print(self.board[self.person[0]+1][self.person[1]])
-        # if self.board[self.person[0]+1][self.person[1]]!=0 and self.board[self.person[0]+1][self.person[1]]<10:
-        #     print("a")
-        #     self.board[self.person[0]][self.person[1]]=int((self.board[self.person[0]][self.person[1]]-self.board[self.person[0]][self.person[1]]%10)/10)
-        #     self.board[self.person[0]+1][self.person[1]]=self.board[self.person[0]+1][self.person[1]]*10+1
-        #     print(self.board[self.person[0]][self.person[1]],self.board[self.person[0]][self.person[1]+1] )
-        # self.reset()
-        self.move(self.person, [self.person[0]+1,self.person[1]])
-    def up(self):
-        # print("z")
-        # print(self.board[self.person[0]-1][self.person[1]])
-        # if self.board[self.person[0]-1][self.person[1]]!=0 and self.board[self.person[0]-1][self.person[1]]<10:
-        #     print("a")
-        #     self.board[self.person[0]][self.person[1]]=int((self.board[self.person[0]][self.person[1]]-self.board[self.person[0]][self.person[1]]%10)/10)
-        #     self.board[self.person[0]-1][self.person[1]]=self.board[self.person[0]-1][self.person[1]]*10+1
-        #     print(self.board[self.person[0]][self.person[1]],self.board[self.person[0]][self.person[1]+1] )
-        # self.reset()
-        self.move(self.person, [self.person[0]-1,self.person[1]])
+
+    def left(self, person, state):
+        return self.move(person, [person[0],person[1]-1], state)
+
+    def right(self, person, state):
+        return self.move(person, [person[0],person[1]+1], state)
+
+    def down(self, person, state):
+        return self.move(person, [person[0]+1,person[1]], state)
+
+    def up(self, person, state):
+        return self.move(person, [person[0]-1,person[1]], state)
+
     def checkDouble(self):
         count = 0
         for i in range(0, self.row):
@@ -112,20 +90,28 @@ class game:
         if count > 1:
             print("THIS IS BAD")
             exit()
-    def move(self, start, end, isperson=True):
+
+    def move(self, start, end, state, isperson=True):
         # print("z")
-        # print(self.board[start[0]][start[1]])
-        startvalue=self.board[start[0]][start[1]]
-        endvalue=self.board[end[0]][end[1]]
+        # state = np.array(state).reshape(self.maxrow, self.maxcol)
+        # state = state[:self.row][:self.col]
+        state = np.array(state).reshape(self.maxrow, self.maxcol)
+        print('before')
+        print(self.toString(state))
+        startvalue=state[start[0]][start[1]]
+        endvalue=state[end[0]][end[1]]
         if endvalue==10 or endvalue==20:
             if isperson==True:
-                self.move(end, [2*end[0]-start[0], 2*end[1]-start[1]], False)
+                state = self.move(end, [2*end[0]-start[0], 2*end[1]-start[1]],state, False)
+                state = np.array(state).reshape(self.maxrow, self.maxcol)
             else:
-                return #False
-        startvalue=self.board[start[0]][start[1]]
-        endvalue=self.board[end[0]][end[1]]
+                #this is when there's a second crate in front
+                return np.ndarray.flatten(state)
+        startvalue=state[start[0]][start[1]]
+        endvalue=state[end[0]][end[1]]
         # print("aardvark")
         # print(startvalue, endvalue)
+        #this is for the wall
         if endvalue!=0 and endvalue<10:
             # print("a")
             if isperson:
@@ -133,79 +119,80 @@ class game:
             else:
                 value=0
             # print("ekans")
-            self.board[start[0]][start[1]]=int((startvalue-startvalue%10)/10)
-            self.board[end[0]][end[1]]=endvalue*10+value#1
+            state[start[0]][start[1]]=int((startvalue-startvalue%10)/10)
+            state[end[0]][end[1]]=endvalue*10+value#1
             # print(startvalue,endvalue)
-            
-        else: 
-            return #False
-        #bruh why are we doing this lol
-        self.reset()
-        # self.checkDouble()
-        print(self.toString())
+        else:
+            #if can't move cuz of box
+            print('after give up moving')
+            print(self.toString(state))
+            return np.ndarray.flatten(state)
+        print('after')
+        print(self.toString(state))
+        return np.ndarray.flatten(state)
 
     # method similar to https://github.com/JoshVarty/AlphaZeroSimple/blob/master/game.py 
-    def get_next_state(self, action):
-        person = self.findPerson()
-        move = ""
+    def get_next_state(self, action, state):
+        person = self.findPerson(state)
         if person[1] - 1 == action[1]:
-            self.left()
-            move = "L"
+            print('left')
+            return self.left(person, state)
         if person[1] + 1 == action[1]:
-            self.right()
-            move = "R"
+            print('right')
+            return self.right(person, state)
         if person[0] - 1 == action[0]:
-            self.up()
-            move =  "U"
+            print('up')
+            return self.up(person, state)
         if person[0] + 1 == action[0]:
-            self.down()
-            move =  "D"
-        return self.board, move
-    def detectLock(self):
+            print('down')
+            return self.down(person, state)
+    def detectLock(self, state):
+        state = np.array(state).reshape(self.maxrow, self.maxcol)
+        state = state[:self.row][:self.col]
         for i in range(0, self.row):
             for j in range(0, self.col):
-                if self.board[i][j] == 10:
+                if state[i][j] == 10:
                     # bottom left
-                    if self.board[i][j-1] == 0 and self.board[i + 1][j] == 0:
+                    if state[i][j-1] == 0 and state[i + 1][j] == 0:
                         return True
-                    if self.board[i][j-1] == 20 and self.board[i + 1][j] == 0:
+                    if state[i][j-1] == 20 and state[i + 1][j] == 0:
                         return True
-                    if self.board[i][j-1] == 0 and self.board[i + 1][j] == 20:
+                    if state[i][j-1] == 0 and state[i + 1][j] == 20:
                         return True
-                    if self.board[i][j-1] == 20 and self.board[i + 1][j] == 20:
+                    if state[i][j-1] == 20 and state[i + 1][j] == 20:
                         return True
                     # top right
-                    if self.board[i][j+1] == 0 and self.board[i - 1][j] == 0:
+                    if state[i][j+1] == 0 and state[i - 1][j] == 0:
                         return True
-                    if self.board[i][j+1] == 20 and self.board[i - 1][j] == 0:
+                    if state[i][j+1] == 20 and state[i - 1][j] == 0:
                         return True
-                    if self.board[i][j+1] == 0 and self.board[i - 1][j] == 20:
+                    if state[i][j+1] == 0 and state[i - 1][j] == 20:
                         return True
-                    if self.board[i][j+1] == 20 and self.board[i - 1][j] == 20:
+                    if state[i][j+1] == 20 and state[i - 1][j] == 20:
                         return True
                     #top left
-                    if self.board[i][j-1] == 0 and self.board[i - 1][j] == 0:
+                    if state[i][j-1] == 0 and state[i - 1][j] == 0:
                         return True
-                    if self.board[i][j-1] == 20 and self.board[i - 1][j] == 0:
+                    if state[i][j-1] == 20 and state[i - 1][j] == 0:
                         return True
-                    if self.board[i][j-1] == 0 and self.board[i - 1][j] == 20:
+                    if state[i][j-1] == 0 and state[i - 1][j] == 20:
                         return True
-                    if self.board[i][j-1] == 20 and self.board[i - 1][j] == 20:
+                    if state[i][j-1] == 20 and state[i - 1][j] == 20:
                         return True
                     #bottom right
-                    if self.board[i][j+1] == 0 and self.board[i + 1][j] == 0:
+                    if state[i][j+1] == 0 and state[i + 1][j] == 0:
                         return True
-                    if self.board[i][j+1] == 20 and self.board[i + 1][j] == 0:
+                    if state[i][j+1] == 20 and state[i + 1][j] == 0:
                         return True
-                    if self.board[i][j+1] == 0 and self.board[i + 1][j] == 20:
+                    if state[i][j+1] == 0 and state[i + 1][j] == 20:
                         return True
-                    if self.board[i][j+1] == 20 and self.board[i + 1][j] == 20:
+                    if state[i][j+1] == 20 and state[i + 1][j] == 20:
                         return True
         return False
-    def get_reward_for_player(self):
-        if self.isWon():
+    def get_reward_for_player(self, state):
+        if self.isWon(state):
             return 1
-        if self.detectLock():
+        if self.detectLock(state):
             return 0
         else:
             return None # try this out, then try attempts out then try outright returning 0 for loss
@@ -235,8 +222,8 @@ class game:
         #if your in the middle go up down left right
         # print('returning these')
         return [(cords[0] + 1, cords[1]), (cords[0] - 1, cords[1]), (cords[0], cords[1] + 1), (cords[0], cords[1] - 1)]
-    def get_valid_moves(self):
-        cords = self.findPerson()
+    def get_valid_moves(self, state):
+        cords = self.findPerson(state)
         validMoves = self.validCords(cords)
         
         # everything is an invalid move by making np array 
@@ -246,10 +233,8 @@ class game:
             newBoard[x][y] = 1
         return newBoard
     
-    def checkValid(self, move):
-        cords = self.findPerson()
-        if move[0] == cords[0] and move[1] == cords[1]:
-            return True
+    def checkValid(self, move, state):
+        cords = self.findPerson(state)
         validMoves = self.validCords(cords)
         for vMove in validMoves:
             if move[0] == vMove[0] and move[1] == vMove[1]:
@@ -259,8 +244,10 @@ class game:
         
 
 
-    def isWon(self):
-        for row in self.board:
+    def isWon(self, state):
+        state = np.array(state).reshape(self.maxrow, self.maxcol)
+        state = state[:self.row][:self.col]
+        for row in state:
             for entry in row:
                 if entry==10:
                     return False
