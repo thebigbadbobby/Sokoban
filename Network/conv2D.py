@@ -30,7 +30,6 @@ class conv2D(nn.Module):
         # print("a",np.shape(x))
         # print(list(self.parameters()))
         # Max pooling over a (2, 2) window
-        x=torch.FloatTensor(encodeboard2(np.array(x).reshape(self.row, self.col)))
         # print("b",np.shape(x))
         # print(list(self.parameters()))
         # print(np.shape(x))
@@ -53,8 +52,11 @@ class conv2D(nn.Module):
         return F.softmax(x, dim=1), torch.sigmoid(value_logit)
 
     def predict(self, board):
+        board = encodeboard2(np.array(board))
         board = torch.FloatTensor(board.astype(np.float32)).to(self.device)
-        board = board.view(1, self.size)
+        # print(board.shape)
+        # exit()
+        # board = board.view(1, 45, 35, 7)
         self.eval()
         with torch.no_grad():
             pi, v = self.forward(board)
