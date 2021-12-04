@@ -96,7 +96,7 @@ class game:
         # print("z")
         # state = np.array(state).reshape(self.maxrow, self.maxcol)
         # state = state[:self.row][:self.col]
-        state = np.array(state).reshape(self.maxrow, self.maxcol)
+        # state = np.array(state).reshape(self.maxrow, self.maxcol)
         # print('before')
         # print(self.toString(state))
         startvalue=state[start[0]][start[1]]
@@ -104,10 +104,10 @@ class game:
         if endvalue==10 or endvalue==20:
             if isperson==True:
                 state = self.move(end, [2*end[0]-start[0], 2*end[1]-start[1]],state, False)
-                state = np.array(state).reshape(self.maxrow, self.maxcol)
+                # state = np.array(state).reshape(self.maxrow, self.maxcol)
             else:
                 #this is when there's a second crate in front
-                return np.ndarray.flatten(state)
+                return state
         startvalue=state[start[0]][start[1]]
         endvalue=state[end[0]][end[1]]
         # print("aardvark")
@@ -126,10 +126,10 @@ class game:
         else:
             #if can't move cuz of box
             # print(self.toString(state))
-            return np.ndarray.flatten(state)
+            return state
         # print('after')
         # print(self.toString(state))
-        return np.ndarray.flatten(state)
+        return state
 
     # method similar to https://github.com/JoshVarty/AlphaZeroSimple/blob/master/game.py 
     def get_next_state(self, action, state,trainerMove=False):

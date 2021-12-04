@@ -3,6 +3,7 @@ import math
 import numpy as np
 # import Node as Node
 import time
+import copy
 def ucb_score(parent, child):
     """
     The score for an action that would transition between the parent and child.
@@ -167,9 +168,9 @@ class MCTS:
             state = parent.state
             # Now we're at a leaf node and we would like to expand
             # Players always play from their own perspective
-            next_state = self.game.get_next_state(action, state)
+            next_state = self.game.get_next_state(action, copy.deepcopy(state))
             # The value of the new state from the perspective of the other player
-            value = self.game.get_reward_for_player(state) # a function that determines if we finished or 
+            value = self.game.get_reward_for_player(next_state) # a function that determines if we finished or 
             if value is None:
                 # If the game has not ended:
                 # EXPAND
