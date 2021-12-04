@@ -36,9 +36,8 @@ class Trainer:
         while True:
             print("exec_loop#: ", exec_loop)
             # time.sleep(5)
-            board = np.ndarray.flatten(state)
             self.mcts = MCTS(self.game, self.model, self.args, self.maxrow, self.maxcol, self.row, self.col)
-            root = self.mcts.run(self.model, board)
+            root = self.mcts.run(self.model, state)
             action_probs = [0 for _ in range(self.action_size)]
             i = 0
             for k in root.children.keys():
@@ -48,7 +47,7 @@ class Trainer:
                 i+=1
 
             action_probs = action_probs / np.sum(action_probs)
-            train_examples.append((board, action_probs))
+            train_examples.append((state, action_probs))
 
             action = root.select_action(temperature=0)
             print(action)

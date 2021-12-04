@@ -9,7 +9,7 @@ class game:
         self.col = col
         self.maxrow = maxrow
         self.maxcol = maxcol
-        # self.stateHistory={self.toString():""}
+        # self.stateHistory={self.toString(board):""}
         self.commandHistory=["start"]
         self.commandLookup={"a":"left","w":"up", "s":"down", "d":"right"}
         self.heuristics={"isLoop": False, "isWon": False, "numDotsDone": 0, "numMoves":0, "percentSolved": self.percentSolved()}
@@ -25,7 +25,7 @@ class game:
         grid=""
         # board = self.board
         # board = board
-        state = np.array(state).reshape(self.maxrow, self.maxcol)
+        # state = np.array(state).reshape(self.maxrow, self.maxcol)
         for row in state[:self.row]:
             for entry in row:
                 if entry==0:
@@ -44,8 +44,10 @@ class game:
         # state = state[:self.maxrow*self.maxcol]
         i=0
         # print(self.board)
-        state = np.array(state).reshape(self.maxrow, self.maxcol)
+        # state = np.array(state).reshape(self.maxrow, self.maxcol)
+        # print(np.shape(state))
         state = state[:self.row][:self.col]
+        
         for row in state:
             j=0
             # print('row')
@@ -96,7 +98,7 @@ class game:
         # print("z")
         # state = np.array(state).reshape(self.maxrow, self.maxcol)
         # state = state[:self.row][:self.col]
-        state = np.array(state).reshape(self.maxrow, self.maxcol)
+        # state = np.array(state).reshape(self.maxrow, self.maxcol)
         # print('before')
         # print(self.toString(state))
         startvalue=state[start[0]][start[1]]
@@ -104,10 +106,10 @@ class game:
         if endvalue==10 or endvalue==20:
             if isperson==True:
                 state = self.move(end, [2*end[0]-start[0], 2*end[1]-start[1]],state, False)
-                state = np.array(state).reshape(self.maxrow, self.maxcol)
+                # state = np.array(state).reshape(self.maxrow, self.maxcol)
             else:
                 #this is when there's a second crate in front
-                return np.ndarray.flatten(state)
+                return state
         startvalue=state[start[0]][start[1]]
         endvalue=state[end[0]][end[1]]
         # print("aardvark")
@@ -126,10 +128,10 @@ class game:
         else:
             #if can't move cuz of box
             # print(self.toString(state))
-            return np.ndarray.flatten(state)
+            return state
         # print('after')
         # print(self.toString(state))
-        return np.ndarray.flatten(state)
+        return state
 
     # method similar to https://github.com/JoshVarty/AlphaZeroSimple/blob/master/game.py 
     def get_next_state(self, action, state,trainerMove=False):
@@ -151,7 +153,7 @@ class game:
                 print('down')
             return self.down(person, state)
     def detectLock(self, state):
-        state = np.array(state).reshape(self.maxrow, self.maxcol)
+        # state = np.array(state).reshape(self.maxrow, self.maxcol)
         state = state[:self.row][:self.col]
         for i in range(0, self.row):
             for j in range(0, self.col):
@@ -197,7 +199,9 @@ class game:
         if self.isWon(state):
             return 1
         if self.detectLock(state):
-            return 0
+            return self.percentSolved()
+        # if self.isLoop(state):
+        #     return self.percentSolved()
         else:
             return None # try this out, then try attempts out then try outright returning 0 for loss
     def validCords(self, cords):
@@ -235,6 +239,7 @@ class game:
         newBoard = np.zeros((self.board.shape))
         for (x, y) in validMoves:
             newBoard[x][y] = 1
+        # print("ekans",validMoves)
         return newBoard
     
     def checkValid(self, move, state):
@@ -249,18 +254,18 @@ class game:
 
 
     def isWon(self, state):
-        state = np.array(state).reshape(self.maxrow, self.maxcol)
+        # state = np.array(state).reshape(self.maxrow, self.maxcol)
         state = state[:self.row][:self.col]
         for row in state:
             for entry in row:
                 if entry==10:
                     return False
         return True
-    def isLoop(self):
-        if self.toString() in self.stateHistory:
+    def isLoop(self, state):
+        if self.toString(state) in self.stateHistory:
             return True
         else:
-            self.stateHistory[self.toString()]=""
+            self.stateHistory[self.toString(state)]=""
             return False
     def numDotsDone(self):
         count=0

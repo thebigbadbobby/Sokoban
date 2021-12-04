@@ -1,6 +1,7 @@
 import torch
 import math
 import numpy as np
+import copy
 # import Node as Node
 import time
 def ucb_score(parent, child):
@@ -66,6 +67,7 @@ class Node:
             # print(score)
             # print(action)
             # print(cords)
+            # print(game.toString(state))
             # time.sleep(1)
             if score > best_score and game.checkValid(action, state):
                 best_score = score
@@ -110,12 +112,12 @@ class Node:
                         missedValid.append((i, j))
         # for the cases where we missed some children cuz of 0 prob
         for c in missedValid:
-            print("cords missing")
-            print(probMissing)
-            print(c)
+            # print("cords missing")
+            # print(probMissing)
+            # print(c)
             self.children[c] = Node(prior = probMissing/len(missedValid))
             exit()
-                        
+
         # for a, prob in enumerate(action_probs):
         #     if prob != 0:
         #         self.children[a] = Node(prior=prob)
@@ -139,37 +141,37 @@ class MCTS:
         self.actualCol = actualCol
 
     def run(self, model, state):
-
         root = Node(0)
-
+        
         # EXPAND root
         #state needs to be 1xnumofelements array
         action_probs, value = model.predict(state)
         # translate action_probs into a mxn array
         # ogAction_probs = action_probs
-        action_probs = np.array(action_probs).reshape(self.row, self.col) # map these to a size var
-        # print(ogAction_probs.shape)
+        action_probs = np.array(action_probs).squeeze() # map these to a size var
+        # print(ogAction_probs.shape
+        
         valid_moves = self.game.get_valid_moves(state) #we know the moves can be up, left, down right so mask based off of position
         action_probs = action_probs * valid_moves  # mask invalid moves
         action_probs /= np.sum(action_probs)
+        # print("c",root.state[2][1] )
         root.expand(state, action_probs, self.game)
-
         for _ in range(self.args['num_simulations']):
             node = root
             search_path = [node]
-            
             # SELECT
             while node and node.expanded():
                 action, node = node.select_child(self.game, node.state)
                 search_path.append(node)
                 # print(node)
+            # print(self.game.findPerson(node.state))
             parent = search_path[-2]
             state = parent.state
             # Now we're at a leaf node and we would like to expand
             # Players always play from their own perspective
-            next_state = self.game.get_next_state(action, state)
+            next_state = self.game.get_next_state(action, copy.deepcopy(state))
             # The value of the new state from the perspective of the other player
-            value = self.game.get_reward_for_player(state) # a function that determines if we finished or 
+            value = self.game.get_reward_for_player(next_state) # a function that determines if we finished or 
             if value is None:
                 # If the game has not ended:
                 # EXPAND
@@ -181,9 +183,7 @@ class MCTS:
                 action_probs /= np.sum(action_probs)
                 node.expand(next_state, action_probs, self.game)
                 # exit()
-
             self.backpropagate(search_path, value)
-
         return root
 
     def backpropagate(self, search_path, value):

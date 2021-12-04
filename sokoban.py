@@ -17,6 +17,7 @@ import torch
 from game import game
 from Network.torchBasic import torchBasic
 from Network.betterNN import betterNN
+from Network.conv2D import conv2D
 from trainer import Trainer
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -64,8 +65,8 @@ board=np.array([[0, 0, 0, 0],
 def main(args):
       x = str(datetime.datetime.now())
       fname = 'error-' + x + '.csv'
-      fp = open(fname, 'x')
-      fp.close()
+      # fp = open(fname, 'x')
+      # fp.close()
       # row, col = 0, 0
       # numWall = 0
       # wallCords = []
@@ -132,7 +133,7 @@ def main(args):
       # exit()
       board_size = maxsize
       action_size = maxsize
-      model = torchBasic(board_size, action_size, device)
+      model = conv2D(board_size, action_size, device, maxrow, maxcol)
       if len(args) > 1:
             model.load_state_dict(torch.load(args[1]))
       # exit()
