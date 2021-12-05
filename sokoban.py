@@ -33,10 +33,10 @@ maxsize = maxrow * maxcol
 
 
 argsLearn = {
-    'batch_size': 64,
-    'numIters': 100,                                # Total number of training iterations
-    'num_simulations': 1000,                         # Total number of MCTS simulations to run when deciding on a move to play
-    'numEps': 100,                                  # Number of full games (episodes) to run during each iteration
+    'batch_size': 5,
+    'numIters': 10,                                # Total number of training iterations
+    'num_simulations': 20,                         # Total number of MCTS simulations to run when deciding on a move to play
+    'numEps': 20,                                  # Number of full games (episodes) to run during each iteration
     'numItersForTrainExamplesHistory': 20,
     'epochs': 20,                                    # Number of epochs of training per iteration
     'checkpoint_path': 'latest.pth',                 # location to save latest set of weights

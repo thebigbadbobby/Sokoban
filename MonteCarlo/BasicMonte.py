@@ -74,6 +74,8 @@ class Node:
                 best_child = child
         if not best_child:
             print('wee woo invalid')
+            print(self.children.items())
+            print(game.toStrings())
             exit()
             # print()
             # print('not bsts child')

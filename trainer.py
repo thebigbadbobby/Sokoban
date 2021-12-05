@@ -4,7 +4,7 @@ from random import shuffle
 import time
 import torch
 import torch.optim as optim
-
+from sklearn.metrics import log_loss
 from MonteCarlo.BasicMonte import MCTS
 from game import game as Game
 import copy
@@ -37,9 +37,11 @@ class Trainer:
             print("exec_loop#: ", exec_loop)
             # time.sleep(5)
             board = copy.deepcopy(state)
+            print("a")
             self.mcts = MCTS(self.game, self.model, self.args, self.maxrow, self.maxcol, self.row, self.col)
             root = self.mcts.run(self.model, board)
             action_probs = [0 for _ in range(self.action_size)]
+            
             i = 0
             for k in root.children.keys():
                 # print(type(root.children[k]))
@@ -89,7 +91,7 @@ class Trainer:
             self.save_checkpoint(folder=".", filename=filename)
 
     def train(self, examples, iteration):
-        optimizer = optim.Adam(self.model.parameters(), lr=5e-4)
+        optimizer = optim.Adam(self.model.parameters(), lr=5e-5)
         pi_losses = []
         v_losses = []
         for epoch in range(self.args['epochs']):
@@ -100,23 +102,27 @@ class Trainer:
                 sample_ids = np.random.randint(len(examples), size=self.args['batch_size'])
                 boards, pis, vs = list(zip(*[examples[i] for i in sample_ids]))
                 boards = torch.FloatTensor(np.array(boards).astype(np.float64))
-                target_pis = torch.FloatTensor(np.array(pis))
+                target_pis = torch.FloatTensor(np.array(pis).reshape(len(pis),self.maxrow,self.maxcol,1))
                 target_vs = torch.FloatTensor(np.array(vs).astype(np.float64))
 
                 # predict
-                boards = boards.contiguous().cuda()
-                target_pis = target_pis.contiguous().cuda()
-                target_vs = target_vs.contiguous().cuda()
+                boards = boards.contiguous()#.cuda()
+                target_pis = target_pis.contiguous()#.cuda()
+                target_vs = target_vs.contiguous()#.cuda()
 
                 # compute output
                 out_pi, out_v = self.model(boards)
                 l_pi = self.loss_pi(target_pis, out_pi)
+                if not (target_pis * torch.log(out_pi)).sum(dim=1).mean()>-1:
+                    print(out_pi)
+                    print(target_pis * torch.log(out_pi))
+                    print(9/0)
                 l_v = self.loss_v(target_vs, out_v)
                 total_loss = l_pi + l_v
-
+                
                 pi_losses.append(float(l_pi))
                 v_losses.append(float(l_v))
-
+                
                 optimizer.zero_grad()
                 total_loss.backward()
                 optimizer.step()
@@ -134,16 +140,20 @@ class Trainer:
             print()
             print("Policy Loss", np.mean(pi_losses))
             print("Value Loss", np.mean(v_losses))
-            print("Examples:")
-            print(out_pi[0].detach())
-            print(target_pis[0])
+            # print("Examples:")
+            # print(out_pi[0].detach())
+            # print(target_pis[0])
 
     def loss_pi(self, targets, outputs):
+        # print(np.shape(targets),np.shape(torch.log(outputs)))
         loss = -(targets * torch.log(outputs)).sum(dim=1)
         return loss.mean()
 
     def loss_v(self, targets, outputs):
+
         loss = torch.sum((targets-outputs.view(-1))**2)/targets.size()[0]
+        # if loss==float("nan"):
+        #     print(targets)
         return loss
 
     def save_checkpoint(self, folder, filename):

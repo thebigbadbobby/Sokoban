@@ -9,7 +9,7 @@ class game:
         self.col = col
         self.maxrow = maxrow
         self.maxcol = maxcol
-        # self.stateHistory={self.toString():""}
+        self.stateHistory={self.toStrings():""}
         self.commandHistory=["start"]
         self.commandLookup={"a":"left","w":"up", "s":"down", "d":"right"}
         self.heuristics={"isLoop": False, "isWon": False, "numDotsDone": 0, "numMoves":0, "percentSolved": self.percentSolved()}
@@ -40,6 +40,25 @@ class game:
                     grid+="☆"
             grid+="\n"
         return grid
+    def toStrings(self):
+        grid=""
+        # board = self.board
+        # board = board
+        for row in self.board:
+            for entry in row:
+                if entry==0:
+                    grid+="■"
+                elif entry==1:
+                    grid+=" "
+                elif entry==2:
+                    grid+="o"
+                elif entry%10==0:
+                    grid+="▤"
+                elif entry%10==1:
+                    grid+="☆"
+            grid+="\n"
+        return grid
+
     def findPerson(self, state):
         # state = state[:self.maxrow*self.maxcol]
         i=0
@@ -196,8 +215,8 @@ class game:
     def get_reward_for_player(self, state):
         if self.isWon(state):
             return 1
-        if self.detectLock(state):
-            return 0
+        if self.detectLock(state) or self.isLoop():
+            return self.percentSolved()
         else:
             return None # try this out, then try attempts out then try outright returning 0 for loss
     def validCords(self, cords):
@@ -257,10 +276,10 @@ class game:
                     return False
         return True
     def isLoop(self):
-        if self.toString() in self.stateHistory:
+        if self.toStrings() in self.stateHistory:
             return True
         else:
-            self.stateHistory[self.toString()]=""
+            self.stateHistory[self.toStrings()]=""
             return False
     def numDotsDone(self):
         count=0

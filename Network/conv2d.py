@@ -27,33 +27,35 @@ class conv2D(nn.Module):
         self.to(device)
 
     def forward(self, x):
+        # print(np.shape(x))
         # print("a",np.shape(x))
         # print(list(self.parameters()))
         # Max pooling over a (2, 2) window
         # print("b",np.shape(x))
         # print(list(self.parameters()))
-        # print(np.shape(x))
-        x = F.max_pool2d(F.relu(self.conv1(x)), (2, 4),1, 1)
+        if not self.training:
+            x = torch.FloatTensor(encodeboard2(np.array(x))).to(self.device)
+        if self.training:
+            x = torch.FloatTensor(encodeboard3(np.array(x))).to(self.device)
+            # print(np.shape(x))
+        x = F.max_pool2d(F.leaky_relu(self.conv1(x)), (2, 4),1, 1)
         # print(np.shape(x))
         # If the size is a square, you can specify with a single number
-        x = F.max_pool2d(F.relu(self.conv2(x)), (2, 4),1, 1)
+        x = F.max_pool2d(F.leaky_relu(self.conv2(x)), (2, 4),1, 1)
         # print(np.shape(x))
-        x = F.max_pool2d(F.relu(self.conv2(x)), (2, 4),1, 1)
+        x = F.max_pool2d(F.leaky_relu(self.conv2(x)), (2, 4),1, 1)
         # x = F.max_pool2d(F.relu(self.conv3(x)), 2)
         # print(np.shape(x))
         y = torch.flatten(x, 1) # flatten all dimensions except the batch dimension
-        y = F.relu(self.fc1(y))
+        y = F.leaky_relu(self.fc1(y))
         # x = F.relu(self.fc2(x))
         # x = self.fc3(x)
         # print(np.shape(x))
         # action_logits = self.action_head(x)
         value_logit = self.value_head(y)
-
         return F.softmax(x, dim=1), torch.sigmoid(value_logit)
 
     def predict(self, board):
-        board = encodeboard2(np.array(board))
-        board = torch.FloatTensor(board.astype(np.float32)).to(self.device)
         # print(board.shape)
         # exit()
         # board = board.view(1, 45, 35, 7)
