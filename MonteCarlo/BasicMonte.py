@@ -1,6 +1,7 @@
 import torch
 import math
 import numpy as np
+import random
 # import Node as Node
 import time
 def ucb_score(parent, child):
@@ -36,12 +37,28 @@ class Node:
         """
         Select action according to the visit count distribution and the temperature.
         """
+        visit_actionPairs = []
         visit_counts = np.array([child.visit_count for child in self.children.values()])
         actions = [action for action in self.children.keys()]
-        # print(actions)
-        # print(visit_counts)
+        for i in range(0, len(actions)):
+            visit_actionPairs.append((visit_counts[i], actions[i]))
+        
+        print(visit_actionPairs)
         if temperature == 0:
-            action = actions[np.argmax(visit_counts)]
+            best = []
+            for pair in visit_actionPairs:
+                if not best:
+                    best.append(pair)
+                    continue
+                if best and pair[0] > best[0][0]:
+                    best = [pair]
+                    continue
+                if best and pair[0] == best[0][0]:
+                    best.append(pair)
+            random.shuffle(best)
+            print('best in move')
+            print(best)
+            action = best[0][1]
         elif temperature == float("inf"):
             action = np.random.choice(actions)
         else:
@@ -57,21 +74,27 @@ class Node:
         """
         Select the child with the highest UCB score.
         """
-        best_score = -np.inf
+        best = []
+        # best_score = -np.inf
         cords = game.findPerson(state)
-        best_action = (0, 0)
-        best_child = None
+        # best_action = (0, 0)
+        # best_child = None
         for action, child in self.children.items():
             score = ucb_score(self, child)
+            # print(type(child))
             # print(score)
             # print(action)
             # print(cords)
             # time.sleep(1)
-            if score > best_score and game.checkValid(action, state):
-                best_score = score
-                best_action = action
-                best_child = child
-        if not best_child:
+            if not best:
+                best.append((score, action, child))
+                continue
+            if best and score > best[0][0] and game.checkValid(action, state):
+                best = [(score, action, child)]
+                continue
+            if best and score == best[0][0] and game.checkValid(action, state):
+                best.append((score, action, child))
+        if not best:
             print('wee woo invalid')
             exit()
             # print()
@@ -85,6 +108,13 @@ class Node:
                     best_child = child
         # print("best_action: ", best_action)
         # print("game location: ", game.findPerson())
+        random.shuffle(best)
+        # print(best)
+        best_action = best[0][1]
+        best_child = best[0][2]
+        # print(best_action)
+        # print(cords)
+        # print(type(best_child))
         return best_action, best_child
 
     def expand(self, state, action_probs, game):
@@ -114,7 +144,7 @@ class Node:
             print(probMissing)
             print(c)
             self.children[c] = Node(prior = probMissing/len(missedValid))
-            exit()
+            # exit()
                         
         # for a, prob in enumerate(action_probs):
         #     if prob != 0:
@@ -153,7 +183,7 @@ class MCTS:
         action_probs = action_probs * valid_moves  # mask invalid moves
         action_probs /= np.sum(action_probs)
         root.expand(state, action_probs, self.game)
-
+        print(self.args['num_simulations'])
         for _ in range(self.args['num_simulations']):
             node = root
             search_path = [node]
@@ -167,7 +197,7 @@ class MCTS:
             state = parent.state
             # Now we're at a leaf node and we would like to expand
             # Players always play from their own perspective
-            next_state = self.game.get_next_state(action, state)
+            next_state, _ = self.game.get_next_state(action, state)
             # The value of the new state from the perspective of the other player
             value = self.game.get_reward_for_player(state) # a function that determines if we finished or 
             if value is None:

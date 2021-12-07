@@ -54,7 +54,7 @@ class Trainer:
             print(action)
             print('GETTING DA MOVE')
             #maybe get action URLD from next state?
-            state = self.game.get_next_state(action, state, True)
+            state, _ = self.game.get_next_state(action, state, True)
             print('state after move')
             print(self.game.toString(state))
             reward = self.game.get_reward_for_player(state)
@@ -89,7 +89,7 @@ class Trainer:
             self.save_checkpoint(folder=".", filename=filename)
 
     def train(self, examples, iteration):
-        optimizer = optim.Adam(self.model.parameters(), lr=5e-4)
+        optimizer = optim.Adam(self.model.parameters(), lr=5e-5)
         pi_losses = []
         v_losses = []
         for epoch in range(self.args['epochs']):

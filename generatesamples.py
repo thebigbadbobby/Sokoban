@@ -73,7 +73,6 @@ def generate_sokoban(model, rows, cols, boxes, ):
         if generated.heuristics['percentSolved']==0:
             break
         generated=copy.deepcopy(random.choice(list(criticalstates.values())))
-    
     return generated
 def make_encoding(board):
     rows=len(board)
@@ -128,7 +127,7 @@ string=""
 while(i<3):
     generated=generate_sokoban(model, 6, 6, 3)
     if generated.heuristics['percentSolved']==0:
-        traces=trace(game(generated.board[:], generated.board[:], len(generated.board), len(generated.board[0])),generated.commandHistory)
+        traces=trace(game(generated.board[:], len(generated.board), len(generated.board[0]), 6, 6),generated.commandHistory)
         for i in range(0, 2):
             arbok=add_walls(traces[2],traces[0])
             saveµtoµfile("6,6,3:"+str(i),make_encoding(arbok[0]))

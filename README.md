@@ -99,4 +99,5 @@ initializes 2 cnn models and generates 10 sample sokobans then returns an array 
 return: array of the number of moves attempted before finding the solution for each sample.
 
 
-
+To play game:
+python3 sokoban.py input.txt 18iteration.pth play

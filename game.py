@@ -130,29 +130,33 @@ class game:
         # print('after')
         # print(self.toString(state))
         return np.ndarray.flatten(state)
-
     # method similar to https://github.com/JoshVarty/AlphaZeroSimple/blob/master/game.py 
     def get_next_state(self, action, state,trainerMove=False):
         person = self.findPerson(state)
+        move = ''
         if person[1] - 1 == action[1]:
             if trainerMove:
-                print('left')
-            return self.left(person, state)
+                move = "L"
+                print(move)
+            return self.left(person, state), move
         if person[1] + 1 == action[1]:
             if trainerMove:
-                print('right')
-            return self.right(person, state)
+                move = "R"
+                print(move)
+            return self.right(person, state), move
         if person[0] - 1 == action[0]:
             if trainerMove:
-                print('up')
-            return self.up(person, state)
+                move = "U"
+                print(move)
+            return self.up(person, state), move
         if person[0] + 1 == action[0]:
             if trainerMove:
-                print('down')
-            return self.down(person, state)
+                move = "D"
+                print(move)
+            return self.down(person, state), move
     def detectLock(self, state):
         state = np.array(state).reshape(self.maxrow, self.maxcol)
-        state = state[:self.row][:self.col]
+        # state = state[:self.row][:self.col]
         for i in range(0, self.row):
             for j in range(0, self.col):
                 if state[i][j] == 10:
