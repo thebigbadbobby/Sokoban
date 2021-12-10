@@ -53,7 +53,7 @@ class Trainer:
             action_probs = action_probs / np.sum(action_probs)
             train_examples.append((board, action_probs))
 
-            action = root.select_action(temperature=0)
+            action = root.select_action(temperature=0) #float("inf")
             print(action)
             print('GETTING DA MOVE')
             #maybe get action URLD from next state?
@@ -92,7 +92,7 @@ class Trainer:
             self.save_checkpoint(folder=".", filename=filename)
 
     def train(self, examples, iteration):
-        optimizer = optim.Adam(self.model.parameters(), lr=5e-5)
+        optimizer = optim.SGD(self.model.parameters(), lr=5e-5)
         pi_losses = []
         v_losses = []
         for epoch in range(self.args['epochs']):

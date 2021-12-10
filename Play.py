@@ -55,6 +55,8 @@ class play:
                     copyBoard = copy.deepcopy(self.game.getBoard())
                     state = copyBoard
             exec_loop += 1
+            if reward == 0:
+                exec_loop = 0
         result = ''
         for letter in play:
             result += letter + ' '

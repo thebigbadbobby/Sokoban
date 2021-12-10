@@ -63,7 +63,10 @@ class Node:
             print(best)
             action = best[0][1]
         elif temperature == float("inf"):
-            action = np.random.choice(actions)
+            try:
+                action = actions[np.random.randint(0,np.argmax(actions)-1)]
+            except:
+                action=actions[0]
         else:
             # See paper appendix Data Generation
             visit_count_distribution = visit_counts ** (1 / temperature)
