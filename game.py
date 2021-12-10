@@ -12,7 +12,7 @@ class game:
         # self.stateHistory={self.toString():""}
         self.commandHistory=["start"]
         self.commandLookup={"a":"left","w":"up", "s":"down", "d":"right"}
-        self.heuristics={"isLoop": False, "isWon": False, "numDotsDone": 0, "numMoves":0, "percentSolved": self.percentSolved()}
+        self.heuristics={"isLoop": False, "isWon": False, "numDotsDone": 0, "numMoves":0}
     # def reset(self):
     #     self.person=self.findPerson()
     def getBoard(self):
@@ -232,6 +232,8 @@ class game:
                 if state[cords[0] + 1][cords[1]] == 10 or state[cords[0] + 1][cords[1]] == 20 or state[cords[0] + 1][cords[1]] == 0:
                     return True
         return False
+    def determineDeadlock(self, state, cords):
+        return
 
     def deleteUnmovableStates(self, state, candidateCords):
         result = []
@@ -243,6 +245,8 @@ class game:
             if state[cords[0]][cords[1]] == 0:
                 continue
             if self.isPinnedByWallOrBox(state, cords): # if it's a box or nothing
+                continue
+            if self.determineDeadlock(state, cords):
                 continue
             result.append(cords)
         return result
@@ -317,11 +321,12 @@ class game:
         return count
     def numMoves(self):
         return len(self.commandHistory)
-    def percentSolved(self):
+    def percentSolved(self, state):
+        state = np.array(state).reshape(self.maxrow, self.maxcol)
         solved=0
         unsolved=0
-        for row in self.board:
-            for entry in row:
+        for row in state[:self.row]:
+            for entry in row[:self.col]:
                 if entry==10:
                     unsolved+=1
                 if entry==20:

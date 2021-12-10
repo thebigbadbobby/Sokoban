@@ -40,7 +40,7 @@ argsLearn = {
     'numEps': 10,                                  # Number of full games (episodes) to run during each iteration
     'epochs': 20,                                    # Number of epochs of training per iteration
     'checkpoint_path': 'latest.pth',                 # location to save latest set of weights
-    'loopStop': 5                                   #stop it from going into infinite loops
+    'loopStop': 10                                   #stop it from going into infinite loops
 }
 # board=[[1, 1, 0, 0, 0, 0, 0, 1],
 #        [0, 0, 0, 1, 1, 1, 0, 1],
@@ -110,16 +110,23 @@ def main(args):
       #       [0, 11, 1, 10, 2,  0],
       #       [0, 1, 1, 0, 0, 0],
       #       [0, 0, 0, 0, 0, 0]])
-      board = np.array([[0, 0, 0, 0, 0],
-            [0, 1, 10, 2, 0],
-            [0, 11, 10, 2, 0],
-            [0, 0, 0, 0, 0]])
+      board = np.array([[0, 0, 0, 0, 0, 0],
+            [0, 1, 2, 0, 0, 0],
+            [0, 1, 10, 10, 2, 0],
+            [0, 11, 10, 2, 0, 0],
+            [0, 0, 0, 0, 0, 0]])
       # board = np.array([[0,  0,  0,  0,  0,  0],
       #          [0,  1, 10,  2,  1,  0],
       #          [0,  1, 10, 21,  0,  0],
       #          [0,  1,  1, 10,  1,  0],
       #          [0,  1,  1,  2,  0,  0],
       #          [0,  0,  0,  0,  0,  0]])
+      # board = np.array([[0, 0, 0, 0, 0, 0],
+      #       [0, 2, 0, 1, 0, 0],
+      #       [0, 10, 10, 2, 1, 0],
+      #       [0, 11, 1, 10, 2,  0],
+      #       [0, 1, 1, 0, 0, 0],
+      #       [0, 0, 0, 0, 0, 0]])
       row = board.shape[0]
       col = board.shape[1]
       # print(board)

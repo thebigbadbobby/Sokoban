@@ -63,6 +63,8 @@ class Trainer:
             reward = self.game.get_reward_for_player(state)
             if exec_loop > self.args['loopStop'] and not reward:
                 reward = 0
+            print('reward')
+            print(reward)
             if reward is not None:
                 ret = []
                 for hist_state, hist_action_probs in train_examples:
