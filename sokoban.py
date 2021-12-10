@@ -35,7 +35,7 @@ maxsize = maxrow * maxcol
 
 argsLearn = {
     'batch_size': 5,
-    'numIters': 200,                                # Total number of training iterations
+    'numIters': 100,                                # Total number of training iterations
     'num_simulations': 20,                         # Total number of MCTS simulations to run when deciding on a move to play
     'numEps': 10,                                  # Number of full games (episodes) to run during each iteration
     'epochs': 20,                                    # Number of epochs of training per iteration
@@ -110,11 +110,15 @@ def main(args):
       #       [0, 11, 1, 10, 2,  0],
       #       [0, 1, 1, 0, 0, 0],
       #       [0, 0, 0, 0, 0, 0]])
-      board = np.array([[0, 0, 0, 0, 0, 0],
-            [0, 1, 2, 0, 0, 0],
-            [0, 1, 10, 10, 2, 0],
-            [0, 11, 10, 2, 0, 0],
-            [0, 0, 0, 0, 0, 0]])
+      # board = np.array([[0, 0, 0, 0, 0, 0],
+      #       [0, 1, 2, 0, 0, 0],
+      #       [0, 1, 10, 10, 2, 0],
+      #       [0, 11, 10, 2, 0, 0],
+      #       [0, 0, 0, 0, 0, 0]]) # this runs with 100 sim on 6x6guud.pth
+      board = np.array([[0, 0, 0, 0, 0],
+            [0, 1, 10, 2, 0],
+            [0, 11, 10, 2, 0],
+            [0, 0, 0, 0, 0]]) #this runs with 20 sim on bestnew.pth
       # board = np.array([[0,  0,  0,  0,  0,  0],
       #          [0,  1, 10,  2,  1,  0],
       #          [0,  1, 10, 21,  0,  0],
@@ -140,6 +144,7 @@ def main(args):
       model = torchBasic(board_size, action_size, device)
       if len(args) > 1:
             model.load_state_dict(torch.load(args[1]))
+            argsLearn['checkpoint_path'] = args[1]
       if len(args) < 3:
             x = str(datetime.datetime.now())
             fname = 'error-' + x + '.csv'

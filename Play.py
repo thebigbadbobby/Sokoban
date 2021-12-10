@@ -2,6 +2,9 @@ from MonteCarlo.BasicMonte import MCTS
 import numpy as np
 import copy
 from game import game as Game
+import torch
+import torch.optim as optim
+import os
 class play:
     def __init__(self, board, model, args, size, row, col, maxrow, maxcol):
         self.board = board
@@ -50,6 +53,9 @@ class play:
                 for hist_state, hist_action_probs in train_examples:
                     # [Board, currentPlayer, actionProbabilities, Reward]
                     ret.append((hist_state, hist_action_probs, reward))
+                self.train(ret)
+                filename = self.args['checkpoint_path']
+                self.save_checkpoint(folder=".", filename=filename)
                 if reward == 0: # reset
                     play = []
                     copyBoard = copy.deepcopy(self.game.getBoard())
@@ -62,3 +68,64 @@ class play:
             result += letter + ' '
         print(len(play), result)
         exit()
+
+    def train(self, examples):
+        optimizer = optim.SGD(self.model.parameters(), lr=5e-5)
+        pi_losses = []
+        v_losses = []
+        for _ in range(self.args['epochs']):
+            self.model.train()
+            sample_ids = np.random.randint(len(examples), size=self.args['batch_size'])
+            boards, pis, vs = list(zip(*[examples[i] for i in sample_ids]))
+            boards = torch.FloatTensor(np.array(boards).astype(np.float64))
+            target_pis = torch.FloatTensor(np.array(pis))
+            target_vs = torch.FloatTensor(np.array(vs).astype(np.float64))
+
+            # predict
+            boards = boards.contiguous().cuda()
+            target_pis = target_pis.contiguous().cuda()
+            target_vs = target_vs.contiguous().cuda()
+
+            # compute output
+            out_pi, out_v = self.model(boards)
+            l_pi = self.loss_pi(target_pis, out_pi)
+            l_v = self.loss_v(target_vs, out_v)
+            total_loss = l_pi + l_v
+
+            pi_losses.append(float(l_pi))
+            v_losses.append(float(l_v))
+
+            optimizer.zero_grad()
+            total_loss.backward()
+            optimizer.step()
+
+            # file1 = open(self.fname, "a")  # append mode
+            # file1.write(str(iteration) + ",")
+            # file1.write(str(epoch) + ",")
+            # file1.write(str(np.format_float_positional(np.mean(pi_losses)) + ","))
+            # file1.write(str(np.format_float_positional(np.mean(v_losses))) + "\n")
+            # # file1.write("Examples:")
+            # # file1.write(out_pi[0].detach())
+            # # file1.write(target_pis[0])
+            # file1.close()
+            print()
+            print("Policy Loss", np.mean(pi_losses))
+            print("Value Loss", np.mean(v_losses))
+            print("Examples:")
+            print(out_pi[0].detach())
+            print(target_pis[0])
+
+    def loss_pi(self, targets, outputs):
+        loss = -(targets * torch.log(outputs)).sum(dim=1)
+        return loss.mean()
+
+    def loss_v(self, targets, outputs):
+        loss = torch.sum((targets-outputs.view(-1))**2)/targets.size()[0]
+        return loss
+
+    def save_checkpoint(self, folder, filename):
+        if not os.path.exists(folder):
+            os.mkdir(folder)
+
+        filepath = os.path.join(folder, filename)
+        torch.save(self.model.state_dict(), filepath)
