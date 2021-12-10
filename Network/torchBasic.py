@@ -1,3 +1,5 @@
+# Note:
+# Based off of: https://github.com/JoshVarty/AlphaZeroSimple/blob/master/model.py
 import numpy as np
 
 import torch

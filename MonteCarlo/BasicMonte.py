@@ -1,3 +1,6 @@
+# Note:
+# Adopted code from source: https://github.com/JoshVarty/AlphaZeroSimple/blob/master/monte_carlo_tree_search.py
+
 import torch
 import math
 import numpy as np
@@ -9,13 +12,13 @@ def ucb_score(parent, child):
     The score for an action that would transition between the parent and child.
     """
     prior_score = child.prior * math.sqrt(parent.visit_count) / (child.visit_count + 1)
-    if child.visit_count > 0:
-        # The value of the child is from the perspective of the opposing player
-        value_score = -child.value()
-    else:
-        value_score = 0
+    # if child.visit_count > 0:
+    #     # The value of the child is from the perspective of the opposing player
+    #     value_score = -child.value()
+    # else:
+    #     value_score = 0
 
-    return value_score + prior_score
+    return prior_score #value_score + 
 
 class Node:
     def __init__(self, prior):
@@ -183,7 +186,6 @@ class MCTS:
         action_probs = action_probs * valid_moves  # mask invalid moves
         action_probs /= np.sum(action_probs)
         root.expand(state, action_probs, self.game)
-        print(self.args['num_simulations'])
         for _ in range(self.args['num_simulations']):
             node = root
             search_path = [node]

@@ -1,3 +1,6 @@
+# Note:
+# Code based off: https://github.com/JoshVarty/AlphaZeroSimple/blob/master/trainer.py
+
 import os
 import numpy as np
 from random import shuffle
