@@ -34,10 +34,10 @@ maxsize = maxrow * maxcol
 
 argsLearn = {
     'batch_size': 5,
-    'numIters': 10,                                # Total number of training iterations
+    'numIters': 5,                                # Total number of training iterations
     'num_simulations': 20,                         # Total number of MCTS simulations to run when deciding on a move to play
-    'numEps': 20,                                  # Number of full games (episodes) to run during each iteration
-    'numItersForTrainExamplesHistory': 20,
+    'numEps': 5,                                  # Number of full games (episodes) to run during each iteration
+    'numItersForTrainExamplesHistory': 5,
     'epochs': 20,                                    # Number of epochs of training per iteration
     'checkpoint_path': 'latest.pth',                 # location to save latest set of weights
     'loopStop': 500                                   #stop it from going into infinite loops
@@ -52,11 +52,12 @@ argsLearn = {
 #        [0, 1, 1, 1, 2, 1, 1, 0],
 #        [0, 0, 0, 0, 0, 0, 0, 0]]
 
-board=np.array([[0, 0, 0, 0],
-      [0, 1, 2, 0],
-      [0, 1,10, 0],
-      [0,11, 1, 0],
-      [0, 0, 0, 0]])
+# board=np.array([[0, 0, 0, 0],
+#       [0, 1, 2, 0],
+#       [0, 1,10, 0],
+#       [0,11, 1, 0],
+#       [0, 0, 0, 0]])
+
 
 # print(solve(board, model, 1000))
 
@@ -110,20 +111,26 @@ def main(args):
       #       for j in range(0, col):
       #             if (i, j) not in wallCords and board[i][j] ==0:
       #                   board[i][j] = 1
-      board = np.array([[0, 0, 0, 0, 0, 0],
-            [0, 2, 0, 1, 0, 0],
-            [0, 10, 10, 2, 1, 0],
-            [0, 11, 1, 10, 2,  0],
-            [0, 1, 1, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0]])
+      # board = np.array([[0, 0, 0, 0, 0, 0],
+      #       [0, 2, 0, 1, 0, 0],
+      #       [0, 10, 10, 2, 1, 0],
+      #       [0, 11, 1, 10, 2,  0],
+      #       [0, 1, 1, 0, 0, 0],
+      #       [0, 0, 0, 0, 0, 0]])
       # board = np.array([[0,  0,  0,  0,  0,  0],
       #          [0,  1, 10,  2,  1,  0],
       #          [0,  1, 10, 21,  0,  0],
       #          [0,  1,  1, 10,  1,  0],
       #          [0,  1,  1,  2,  0,  0],
       #          [0,  0,  0,  0,  0,  0]])
+      board=np.array([[0, 0, 0, 0, 0],
+      [0, 1, 2, 0, 0],
+      [0, 1,10, 0, 0],
+      [0, 1,11, 0, 0],
+      [0, 0, 0, 0, 0]])
       row = board.shape[0]
       col = board.shape[1]
+      argsLearn['loopStop']=row*col
       # print(board)
       board = encodeboard(board, (maxrow, maxcol))
       # print(board)

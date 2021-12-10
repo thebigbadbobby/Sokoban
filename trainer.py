@@ -52,7 +52,7 @@ class Trainer:
             action_probs = action_probs / np.sum(action_probs)
             train_examples.append((board, action_probs))
 
-            action = root.select_action(temperature=0)
+            action = root.select_action(temperature=float("inf"))
             print(action)
             print('GETTING DA MOVE')
             #maybe get action URLD from next state?
@@ -60,6 +60,8 @@ class Trainer:
             print('state after move')
             print(self.game.toString(state))
             reward = self.game.get_reward_for_player(state)
+            if self.game.isWon(state):
+                self.args['loopStop']=min(self.args['loopStop'], exec_loop +5+exec_loop**.5 )
             if exec_loop > self.args['loopStop'] and not reward:
                 reward = 0
             if reward is not None:
@@ -91,7 +93,7 @@ class Trainer:
             self.save_checkpoint(folder=".", filename=filename)
 
     def train(self, examples, iteration):
-        optimizer = optim.Adam(self.model.parameters(), lr=5e-5)
+        optimizer = optim.SGD(self.model.parameters(), lr=1)
         pi_losses = []
         v_losses = []
         for epoch in range(self.args['epochs']):

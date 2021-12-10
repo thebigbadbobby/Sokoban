@@ -4,6 +4,7 @@ import numpy as np
 # import Node as Node
 import time
 import copy
+import random
 def ucb_score(parent, child):
     """
     The score for an action that would transition between the parent and child.
@@ -38,19 +39,26 @@ class Node:
         Select action according to the visit count distribution and the temperature.
         """
         visit_counts = np.array([child.visit_count for child in self.children.values()])
+        
         actions = [action for action in self.children.keys()]
         # print(actions)
         # print(visit_counts)
+        # print(temperature)
         if temperature == 0:
+            print(np.argmax(visit_counts))
             action = actions[np.argmax(visit_counts)]
         elif temperature == float("inf"):
-            action = np.random.choice(actions)
+            try:
+                action = actions[np.random.randint(0,np.argmax(actions)-1)]
+            except:
+                action=actions[0]
         else:
             # See paper appendix Data Generation
             visit_count_distribution = visit_counts ** (1 / temperature)
             visit_count_distribution = visit_count_distribution / sum(visit_count_distribution)
+            actions = [str(action) for action in actions]
             action = np.random.choice(actions, p=visit_count_distribution)
-
+            action=eval(action)
         return action
 
     # make action put out something that indicates right, left, etc. 
@@ -62,6 +70,7 @@ class Node:
         cords = game.findPerson(state)
         best_action = (0, 0)
         best_child = None
+        # print(self.children.items())
         for action, child in self.children.items():
             score = ucb_score(self, child)
             # print(score)
@@ -91,6 +100,7 @@ class Node:
         return best_action, best_child
 
     def expand(self, state, action_probs, game):
+        # print("ekans",game.findPerson(state))
         """
         We expand a node and keep track of the prior policy probability given by neural network
         """
@@ -142,12 +152,12 @@ class MCTS:
         self.actualCol = actualCol
 
     def run(self, model, state):
-
+        print("arbok")
         root = Node(0)
-
         # EXPAND root
         #state needs to be 1xnumofelements array
         action_probs, value = model.predict(state)
+
         # translate action_probs into a mxn array
         # ogAction_probs = action_probs
         action_probs = np.array(action_probs).reshape(self.row, self.col) # map these to a size var
@@ -155,12 +165,13 @@ class MCTS:
         valid_moves = self.game.get_valid_moves(state) #we know the moves can be up, left, down right so mask based off of position
         action_probs = action_probs * valid_moves  # mask invalid moves
         action_probs /= np.sum(action_probs)
+        print("ekans",action_probs[1:5,1:4])
         root.expand(state, action_probs, self.game)
-
+        
         for _ in range(self.args['num_simulations']):
+            # print("for loop start")
             node = root
             search_path = [node]
-            
             # SELECT
             while node and node.expanded():
                 action, node = node.select_child(self.game, node.state)
@@ -173,7 +184,8 @@ class MCTS:
             next_state = self.game.get_next_state(action, copy.deepcopy(state))
             # The value of the new state from the perspective of the other player
             value = self.game.get_reward_for_player(next_state) # a function that determines if we finished or 
-            if value is None:
+            # print(value)
+            if value is None or value<=0:
                 # If the game has not ended:
                 # EXPAND
                 action_probs, value = model.predict(next_state)

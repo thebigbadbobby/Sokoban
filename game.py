@@ -215,7 +215,7 @@ class game:
     def get_reward_for_player(self, state):
         if self.isWon(state):
             return 1
-        if self.detectLock(state) or self.isLoop():
+        if self.detectLock(state):
             return self.percentSolved()
         else:
             return None # try this out, then try attempts out then try outright returning 0 for loss
