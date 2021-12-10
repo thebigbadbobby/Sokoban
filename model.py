@@ -49,14 +49,18 @@ def encodeboard2(board):
             j+=1
         i+=1
     return board3d
-def encodeboard3(board):
+def encodeboard3(board, batch_size):
+    print(board)
+    print(board[0])
+    print(board.shape)
     # bigboard=np.zeros(size)
     # bigboard[:np.array(board).shape[0],:np.array(board).shape[1]]=np.array(board)
-    board3d=np.zeros((len(board),len(board[0]),len(board[0][0]), 7))
-    for h in range(0,len(board)):
+    board3d=np.zeros((len(board),len(board[0]), batch_size, 7))
+    for h in range(0,batch_size):
         i=0
-        for row in board[h]:
+        for row in board:
             j=0
+            print(row)
             for entry in row:
                 if entry==0:
                     board3d[h][i,j]=np.array([1,0,0,0,0,0,0])

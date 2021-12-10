@@ -35,12 +35,12 @@ maxsize = maxrow * maxcol
 argsLearn = {
     'batch_size': 5,
     'numIters': 10,                                # Total number of training iterations
-    'num_simulations': 20,                         # Total number of MCTS simulations to run when deciding on a move to play
+    'num_simulations': 10,                         # Total number of MCTS simulations to run when deciding on a move to play
     'numEps': 20,                                  # Number of full games (episodes) to run during each iteration
     'numItersForTrainExamplesHistory': 20,
     'epochs': 20,                                    # Number of epochs of training per iteration
     'checkpoint_path': 'latest.pth',                 # location to save latest set of weights
-    'loopStop': 500                                   #stop it from going into infinite loops
+    'loopStop': 9                                   #stop it from going into infinite loops
 }
 # board=[[1, 1, 0, 0, 0, 0, 0, 1],
 #        [0, 0, 0, 1, 1, 1, 0, 1],
@@ -110,12 +110,17 @@ def main(args):
       #       for j in range(0, col):
       #             if (i, j) not in wallCords and board[i][j] ==0:
       #                   board[i][j] = 1
-      board = np.array([[0, 0, 0, 0, 0, 0],
-            [0, 2, 0, 1, 0, 0],
-            [0, 10, 10, 2, 1, 0],
-            [0, 11, 1, 10, 2,  0],
-            [0, 1, 1, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0]])
+      # board = np.array([[0, 0, 0, 0, 0, 0],
+      #       [0, 2, 0, 1, 0, 0],
+      #       [0, 10, 10, 2, 1, 0],
+      #       [0, 11, 1, 10, 2,  0],
+      #       [0, 1, 1, 0, 0, 0],
+      #       [0, 0, 0, 0, 0, 0]])
+      board=np.array([[0, 0, 0, 0, 0],
+      [0, 1, 2, 0, 0],
+      [0, 1,10, 0, 0],
+      [0,11, 1, 0, 0],
+      [0, 0, 0, 0, 0]])
       # board = np.array([[0,  0,  0,  0,  0,  0],
       #          [0,  1, 10,  2,  1,  0],
       #          [0,  1, 10, 21,  0,  0],
@@ -132,7 +137,7 @@ def main(args):
       # exit()
       board_size = maxsize
       action_size = maxsize
-      model = conv2D(board_size, action_size, device, maxrow, maxcol)
+      model = conv2D(board_size, action_size, device, maxrow, maxcol, argsLearn)
       # model = torchBasic(board_size, action_size, device)
       if len(args) > 1:
             model.load_state_dict(torch.load(args[1]))

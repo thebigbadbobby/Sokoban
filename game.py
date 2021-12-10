@@ -215,39 +215,69 @@ class game:
     def get_reward_for_player(self, state):
         if self.isWon(state):
             return 1
-        if self.detectLock(state) or self.isLoop():
+        if self.detectLock(state): #batch_size
             return self.percentSolved()
         else:
             return None # try this out, then try attempts out then try outright returning 0 for loss
-    def validCords(self, cords):
+    def isPinnedByWallOrBox(self, state, cords):
+        if state[cords[0]][cords[1]] == 10 or state[cords[0]][cords[1]] == 20:
+            direction = self.getAction(cords, state)
+            if direction == "L":
+                if state[cords[0]][cords[1] - 1] == 10 or state[cords[0]][cords[1] - 1] == 20 or state[cords[0]][cords[1] - 1] == 0:
+                    return True
+            if direction == "R":
+                if state[cords[0]][cords[1] + 1] == 10 or state[cords[0]][cords[1] + 1] == 20 or state[cords[0]][cords[1] + 1] == 0:
+                    return True
+            if direction == "U":
+                if state[cords[0] - 1][cords[1]] == 10 or state[cords[0] - 1][cords[1]] == 20 or state[cords[0] - 1][cords[1]] == 0:
+                    return True
+            if direction == "D":
+                if state[cords[0] + 1][cords[1]] == 10 or state[cords[0] + 1][cords[1]] == 20 or state[cords[0] + 1][cords[1]] == 0:
+                    return True
+        return False
+
+    def deleteUnmovableStates(self, state, candidateCords):
+        result = []
+        # print(candidateCords)
+        state = np.array(state).reshape(self.maxrow, self.maxcol)
+        # print(state.shape)
+        for cords in candidateCords:
+            # if move results into walking into a wall
+            if state[cords[0]][cords[1]] == 0:
+                continue
+            if self.isPinnedByWallOrBox(state, cords): # if it's a box or nothing
+                continue
+            result.append(cords)
+        return result
+    def validCords(self, state, cords):
         #top board
         if cords[0] == 0 and cords[1] == 0:
-            return [(cords[0] + 1, cords[1]), (cords[0], cords[1] + 1)]
+            return self.deleteUnmovableStates(state, [(cords[0] + 1, cords[1]), (cords[0], cords[1] + 1)])
         if cords[0] == 0 and cords[1] == len(self.board[0]) - 1:
-            return [(cords[0], cords[1] - 1), (cords[0] + 1, cords[1])]
+            return self.deleteUnmovableStates(state, [(cords[0], cords[1] - 1), (cords[0] + 1, cords[1])])
         if cords[0] == 0 and not cords[1] == 0:
-            return [(cords[0], cords[1] + 1), (cords[0], cords[1] - 1), (cords[0] + 1, cords[1])]
+            return self.deleteUnmovableStates(state, [(cords[0], cords[1] + 1), (cords[0], cords[1] - 1), (cords[0] + 1, cords[1])])
 
         #bottom board
         if cords[0] == len(self.board) - 1 and cords[1] == 0:
-            return [(cords[0] - 1, cords[1]), (cords[0], cords[1] + 1)]
+            return self.deleteUnmovableStates(state, [(cords[0] - 1, cords[1]), (cords[0], cords[1] + 1)])
         if cords[0] == len(self.board) - 1 and cords[1] == len(self.board[0]) - 1:
-            return([cords[0] - 1, cords[1], (cords[0], cords[1] - 1)])
+            return self.deleteUnmovableStates(state, [cords[0] - 1, cords[1], (cords[0], cords[1] - 1)])
         if cords[0] == len(self.board) - 1 and not cords[1] == 0:
-            return[(cords[0] - 1, cords[1]), (cords[0], cords[1] - 1), (cords[0], cords[1] + 1)]
+            return self.deleteUnmovableStates(state, [(cords[0] - 1, cords[1]), (cords[0], cords[1] - 1), (cords[0], cords[1] + 1)])
         
         #sides of the board
         if not cords[0] == 0 and cords[1] == 0:
-            return [(cords[0] + 1, cords[1]), (cords[0] - 1, cords[1]), (cords[0], cords[1] + 1)]
+            return self.deleteUnmovableStates(state, [(cords[0] + 1, cords[1]), (cords[0] - 1, cords[1]), (cords[0], cords[1] + 1)])
         if not cords[0] == 0 and cords[1] == len(self.board[0]) - 1:
-            return [((cords[0] + 1, cords[1]), (cords[0] - 1, cords[1]), (cords[0], cords[1] - 1))]
+            return self.deleteUnmovableStates(state, [((cords[0] + 1, cords[1]), (cords[0] - 1, cords[1]), (cords[0], cords[1] - 1))])
         
         #if your in the middle go up down left right
         # print('returning these')
-        return [(cords[0] + 1, cords[1]), (cords[0] - 1, cords[1]), (cords[0], cords[1] + 1), (cords[0], cords[1] - 1)]
+        return self.deleteUnmovableStates(state, [(cords[0] + 1, cords[1]), (cords[0] - 1, cords[1]), (cords[0], cords[1] + 1), (cords[0], cords[1] - 1)])
     def get_valid_moves(self, state):
         cords = self.findPerson(state)
-        validMoves = self.validCords(cords)
+        validMoves = self.validCords(state, cords)
         
         # everything is an invalid move by making np array 
         #for validMoves, mark i, j as 1
@@ -255,10 +285,20 @@ class game:
         for (x, y) in validMoves:
             newBoard[x][y] = 1
         return newBoard
-    
+    def getAction(self, action, state):
+        person = self.findPerson(state)
+        move = ''
+        if person[1] - 1 == action[1]:
+            return "L"
+        if person[1] + 1 == action[1]:
+            return "R"
+        if person[0] - 1 == action[0]:
+            return "U"
+        if person[0] + 1 == action[0]:
+            return "D"
     def checkValid(self, move, state):
         cords = self.findPerson(state)
-        validMoves = self.validCords(cords)
+        validMoves = self.validCords(state, cords)
         for vMove in validMoves:
             if move[0] == vMove[0] and move[1] == vMove[1]:
                 return True
@@ -277,6 +317,7 @@ class game:
         return True
     def isLoop(self):
         if self.toStrings() in self.stateHistory:
+            print('LOPPOOP')
             return True
         else:
             self.stateHistory[self.toStrings()]=""

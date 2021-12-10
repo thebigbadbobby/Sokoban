@@ -9,13 +9,13 @@ def ucb_score(parent, child):
     The score for an action that would transition between the parent and child.
     """
     prior_score = child.prior * math.sqrt(parent.visit_count) / (child.visit_count + 1)
-    if child.visit_count > 0:
-        # The value of the child is from the perspective of the opposing player
-        value_score = -child.value()
-    else:
-        value_score = 0
+    # if child.visit_count > 0:
+    #     # The value of the child is from the perspective of the opposing player
+    #     value_score = -child.value()
+    # else:
+    #     value_score = 0
 
-    return value_score + prior_score
+    return prior_score
 
 class Node:
     def __init__(self, prior):
@@ -44,7 +44,10 @@ class Node:
         if temperature == 0:
             action = actions[np.argmax(visit_counts)]
         elif temperature == float("inf"):
-            action = np.random.choice(actions)
+            try:
+                action = actions[np.random.randint(0,np.argmax(actions)-1)]
+            except:
+                action=actions[0]
         else:
             # See paper appendix Data Generation
             visit_count_distribution = visit_counts ** (1 / temperature)
@@ -173,9 +176,11 @@ class MCTS:
             next_state = self.game.get_next_state(action, copy.deepcopy(state))
             # The value of the new state from the perspective of the other player
             value = self.game.get_reward_for_player(next_state) # a function that determines if we finished or 
+            # print(value)
             if value is None:
                 # If the game has not ended:
                 # EXPAND
+                # print('here')
                 action_probs, value = model.predict(next_state)
                 valid_moves = self.game.get_valid_moves(next_state)
                 # ogAction_probs = action_probs

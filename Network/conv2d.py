@@ -4,12 +4,13 @@ import torch.nn.functional as F
 import numpy as np
 from model import *
 class conv2D(nn.Module):
-    def __init__(self, board_size, action_size, device, row, col):
+    def __init__(self, board_size, action_size, device, row, col, args):
         self.action_size=action_size
         self.device=device
         self.size = board_size
         self.row = row
         self.col = col
+        self.args = args
         # print(row, col)
         super(conv2D, self).__init__()
         # 1 input image channel, 6 output channels, 5x5 square convolution
@@ -36,7 +37,7 @@ class conv2D(nn.Module):
         if not self.training:
             x = torch.FloatTensor(encodeboard2(np.array(x))).to(self.device)
         if self.training:
-            x = torch.FloatTensor(encodeboard3(np.array(x))).to(self.device)
+            x = torch.FloatTensor(encodeboard2(x.cpu().numpy()[0])).to(self.device)
             # print(np.shape(x))
         x = F.max_pool2d(F.leaky_relu(self.conv1(x)), (2, 4),1, 1)
         # print(np.shape(x))
