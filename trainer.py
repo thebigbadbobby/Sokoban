@@ -84,7 +84,7 @@ class Trainer:
             shuffle(train_examples)
             self.train(train_examples, i)
             filename = self.args['checkpoint_path']
-            self.save_checkpoint(folder=".", filename=filename)
+            self.save_checkpoint(folder="./models/", filename=filename)
 
     def train(self, examples, iteration):
         optimizer = optim.SGD(self.model.parameters(), lr=5e-5)

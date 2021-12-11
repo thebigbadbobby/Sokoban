@@ -1,8 +1,4 @@
 import numpy as np
-# import tensorflow as tf
-# from tensorflow.keras import backend as K
-# from tensorflow.keras import layers
-# from tensorflow import keras
 import random
 import time
 import copy
@@ -18,7 +14,7 @@ import torch
 from game import game
 from Network.torchBasic import torchBasic
 from trainer import Trainer
-
+import os
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 #   Wall  = 0
 #   Space = 1
@@ -41,26 +37,15 @@ argsLearn = {
     'checkpoint_path': 'latest.pth',                 # location to save latest set of weights
     'loopStop': 10                                   #stop it from going into infinite loops
 }
-# board=[[1, 1, 0, 0, 0, 0, 0, 1],
-#        [0, 0, 0, 1, 1, 1, 0, 1],
-#        [0, 2,11,10, 1, 1, 0, 1],
-#        [0, 0, 0, 1,10, 2, 0, 1],
-#        [0, 2, 0, 0,10, 1, 0, 1],
-#        [0, 1, 0, 1, 2, 1, 0, 0],
-#        [0,10, 1,20,10,10, 2, 0],
-#        [0, 1, 1, 1, 2, 1, 1, 0],
-#        [0, 0, 0, 0, 0, 0, 0, 0]]
-
-board=np.array([[0, 0, 0, 0],
-      [0, 1, 2, 0],
-      [0, 1,10, 0],
-      [0,11, 1, 0],
-      [0, 0, 0, 0]])
-
-# print(solve(board, model, 1000))
 
 
 def main(args):
+      path = './error/'
+      if not os.path.exists(path):
+            os.makedirs(path)
+      path = './models/'
+      if not os.path.exists(path):
+            os.makedirs(path)
       row, col = 0, 0
       numWall = 0
       wallCords = []
@@ -102,39 +87,7 @@ def main(args):
             for j in range(0, col):
                   if (i, j) not in wallCords and board[i][j] ==0:
                         board[i][j] = 1
-      # board = np.array([[0, 0, 0, 0, 0, 0],
-      #       [0, 2, 0, 1, 0, 0],
-      #       [0, 10, 10, 2, 1, 0],
-      #       [0, 11, 1, 10, 2,  0],
-      #       [0, 1, 1, 0, 0, 0],
-      #       [0, 0, 0, 0, 0, 0]])
-      # board = np.array([[0, 0, 0, 0, 0, 0],
-      #       [0, 2, 1, 1, 2, 0],
-      #       [0, 10, 1, 1, 10, 0],
-      #       [0, 1, 1, 1, 1, 0],
-      #       [0, 2, 10, 11, 1, 0],
-      #       [0, 0, 0, 0, 0, 0]]) # this runs terribly 6x6 trivial
-      # board = np.array([[0, 0, 0, 0, 0, 0],
-      #       [0, 1, 2, 0, 0, 0],
-      #       [0, 1, 10, 10, 2, 0],
-      #       [0, 11, 10, 2, 0, 0],
-      #       [0, 0, 0, 0, 0, 0]]) # this runs with 100 sim on 6x6guud.pth
-      board = np.array([[0, 0, 0, 0, 0],
-            [0, 1, 10, 2, 0],
-            [0, 11, 10, 2, 0],
-            [0, 0, 0, 0, 0]]) #this runs with 20 sim on bestnew.pth
-      # board = np.array([[0,  0,  0,  0,  0,  0],
-      #          [0,  1, 10,  2,  1,  0],
-      #          [0,  1, 10, 21,  0,  0],
-      #          [0,  1,  1, 10,  1,  0],
-      #          [0,  1,  1,  2,  0,  0],
-      #          [0,  0,  0,  0,  0,  0]])
-      # board = np.array([[0, 0, 0, 0, 0, 0],
-      #       [0, 2, 0, 1, 0, 0],
-      #       [0, 10, 10, 2, 1, 0],
-      #       [0, 11, 1, 10, 2,  0],
-      #       [0, 1, 1, 0, 0, 0],
-      #       [0, 0, 0, 0, 0, 0]])
+
       row = board.shape[0]
       col = board.shape[1]
       board = encodeboard(board, (maxrow, maxcol))
@@ -144,10 +97,10 @@ def main(args):
       model = torchBasic(board_size, action_size, device)
       if len(args) > 1:
             model.load_state_dict(torch.load(args[1]))
-            argsLearn['checkpoint_path'] = args[1]
+            # argsLearn['checkpoint_path'] = args[1]
       if len(args) < 3:
             x = str(datetime.datetime.now())
-            fname = 'error-' + x + '.csv'
+            fname = './error/error-' + x + '.csv'
             fp = open(fname, 'x')
             fp.close()
             trainer = Trainer(board, model, argsLearn, maxsize, row, col, maxrow, maxcol, fname)
