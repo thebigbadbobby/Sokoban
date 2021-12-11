@@ -7,6 +7,7 @@ import numpy as np
 import random
 # import Node as Node
 import time
+verbose = False
 def ucb_score(parent, child):
     """
     The score for an action that would transition between the parent and child.
@@ -46,7 +47,6 @@ class Node:
         for i in range(0, len(actions)):
             visit_actionPairs.append((visit_counts[i], actions[i]))
         
-        print(visit_actionPairs)
         if temperature == 0:
             best = []
             for pair in visit_actionPairs:
@@ -59,8 +59,9 @@ class Node:
                 if best and pair[0] == best[0][0]:
                     best.append(pair)
             random.shuffle(best)
-            print('best in move')
-            print(best)
+            if verbose:
+                print('best in move')
+                print(best)
             action = best[0][1]
         elif temperature == float("inf"):
             try:
@@ -81,17 +82,9 @@ class Node:
         Select the child with the highest UCB score.
         """
         best = []
-        # best_score = -np.inf
         cords = game.findPerson(state)
-        # best_action = (0, 0)
-        # best_child = None
         for action, child in self.children.items():
             score = ucb_score(self, child)
-            # print(type(child))
-            # print(score)
-            # print(action)
-            # print(cords)
-            # time.sleep(1)
             if not best:
                 best.append((score, action, child))
                 continue
@@ -103,24 +96,9 @@ class Node:
         if not best:
             print('wee woo invalid')
             exit()
-            # print()
-            # print('not bsts child')
-            for action, child in self.children.items():
-                score = ucb_score(self, child)
-                # print(action)
-                if score > best_score:
-                    best_score = score
-                    best_action = action
-                    best_child = child
-        # print("best_action: ", best_action)
-        # print("game location: ", game.findPerson())
         random.shuffle(best)
-        # print(best)
         best_action = best[0][1]
         best_child = best[0][2]
-        # print(best_action)
-        # print(cords)
-        # print(type(best_child))
         return best_action, best_child
 
     def expand(self, state, action_probs, game):
@@ -135,26 +113,18 @@ class Node:
             for j in range(0, len(action_probs[i])):
                 prob = action_probs[i][j]
                 if game.checkValid((i, j), state):
-                    # print('inside')
-                    # print(i, j, prob)
-                    # print(cords)
                     if prob != 0:
                         self.children[(i, j)] = Node(prior = prob)
                         probMissing -= prob
                     else:
-                        # print(i, j)
                         missedValid.append((i, j))
         # for the cases where we missed some children cuz of 0 prob
         for c in missedValid:
-            print("cords missing")
-            print(probMissing)
-            print(c)
+            if verbose:
+                print("cords missing")
+                print(probMissing)
+                print(c)
             self.children[c] = Node(prior = probMissing/len(missedValid))
-            # exit()
-                        
-        # for a, prob in enumerate(action_probs):
-        #     if prob != 0:
-        #         self.children[a] = Node(prior=prob)
 
     def __repr__(self):
         """
@@ -182,9 +152,7 @@ class MCTS:
         #state needs to be 1xnumofelements array
         action_probs, value = model.predict(state)
         # translate action_probs into a mxn array
-        # ogAction_probs = action_probs
         action_probs = np.array(action_probs).reshape(self.row, self.col) # map these to a size var
-        # print(ogAction_probs.shape)
         valid_moves = self.game.get_valid_moves(state) #we know the moves can be up, left, down right so mask based off of position
         action_probs = action_probs * valid_moves  # mask invalid moves
         action_probs /= np.sum(action_probs)
@@ -215,7 +183,6 @@ class MCTS:
                 action_probs = action_probs * valid_moves  # mask invalid moves
                 action_probs /= np.sum(action_probs)
                 node.expand(next_state, action_probs, self.game)
-                # exit()
 
             self.backpropagate(search_path, value)
 

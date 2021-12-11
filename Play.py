@@ -5,6 +5,7 @@ from game import game as Game
 import torch
 import torch.optim as optim
 import os
+verbose = False
 class play:
     def __init__(self, board, model, args, size, row, col, maxrow, maxcol):
         self.board = board
@@ -22,11 +23,13 @@ class play:
         state = self.game.getBoard()
         exec_loop = 0
         train_examples = []
-        print('init board')
-        print(self.game.toString(state))
+        if verbose:
+            print('init board')
+            print(self.game.toString(state))
         while not self.game.isWon(state):
             board = np.ndarray.flatten(state)
-            print("exec_loop#: ", exec_loop)
+            if verbose:
+                print("exec_loop#: ", exec_loop)
             self.mcts = MCTS(self.game, self.model, self.args, self.maxrow, self.maxcol, self.row, self.col)
             root = self.mcts.run(self.model, board)
             action_probs = [0 for _ in range(self.action_size)]
@@ -39,19 +42,18 @@ class play:
             train_examples.append((board, action_probs))
 
             action = root.select_action(temperature=0)
-            print(action)
-            print('GETTING DA MOVE')
             state, move = self.game.get_next_state(action, state, True)
+            if verbose:
+                print(action)
+                print('state after move')
+                print(self.game.toString(state))
             play.append(move)
-            print('state after move')
-            print(self.game.toString(state))
             reward = self.game.get_reward_for_player(state)
             if exec_loop > self.args['loopStop'] and not reward:
                 reward = 0
             if reward is not None:
                 ret = []
                 for hist_state, hist_action_probs in train_examples:
-                    # [Board, currentPlayer, actionProbabilities, Reward]
                     ret.append((hist_state, hist_action_probs, reward))
                 self.train(ret)
                 filename = self.args['checkpoint_path']
@@ -98,22 +100,13 @@ class play:
             optimizer.zero_grad()
             total_loss.backward()
             optimizer.step()
-
-            # file1 = open(self.fname, "a")  # append mode
-            # file1.write(str(iteration) + ",")
-            # file1.write(str(epoch) + ",")
-            # file1.write(str(np.format_float_positional(np.mean(pi_losses)) + ","))
-            # file1.write(str(np.format_float_positional(np.mean(v_losses))) + "\n")
-            # # file1.write("Examples:")
-            # # file1.write(out_pi[0].detach())
-            # # file1.write(target_pis[0])
-            # file1.close()
-            print()
-            print("Policy Loss", np.mean(pi_losses))
-            print("Value Loss", np.mean(v_losses))
-            print("Examples:")
-            print(out_pi[0].detach())
-            print(target_pis[0])
+            if verbose:
+                print()
+                print("Policy Loss", np.mean(pi_losses))
+                print("Value Loss", np.mean(v_losses))
+                print("Examples:")
+                print(out_pi[0].detach())
+                print(target_pis[0])
 
     def loss_pi(self, targets, outputs):
         loss = -(targets * torch.log(outputs)).sum(dim=1)

@@ -17,7 +17,6 @@ import torch
 
 from game import game
 from Network.torchBasic import torchBasic
-from Network.betterNN import betterNN
 from trainer import Trainer
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -71,7 +70,6 @@ def main(args):
       boxCords = []
       playerStart = (0, 0)
       count = 0
-      print(args)
       f = open(args[0], 'r')
       row, col = [int(x) for x in next(f).split()]
       for line in f:
@@ -111,6 +109,12 @@ def main(args):
       #       [0, 1, 1, 0, 0, 0],
       #       [0, 0, 0, 0, 0, 0]])
       # board = np.array([[0, 0, 0, 0, 0, 0],
+      #       [0, 2, 1, 1, 2, 0],
+      #       [0, 10, 1, 1, 10, 0],
+      #       [0, 1, 1, 1, 1, 0],
+      #       [0, 2, 10, 11, 1, 0],
+      #       [0, 0, 0, 0, 0, 0]]) # this runs terribly 6x6 trivial
+      # board = np.array([[0, 0, 0, 0, 0, 0],
       #       [0, 1, 2, 0, 0, 0],
       #       [0, 1, 10, 10, 2, 0],
       #       [0, 11, 10, 2, 0, 0],
@@ -133,12 +137,8 @@ def main(args):
       #       [0, 0, 0, 0, 0, 0]])
       row = board.shape[0]
       col = board.shape[1]
-      # print(board)
       board = encodeboard(board, (maxrow, maxcol))
-      # print(board)
       sokoban = game(board, row, col, maxrow, maxcol)
-      # print(sokoban.toString())
-      # exit()
       board_size = maxsize
       action_size = maxsize
       model = torchBasic(board_size, action_size, device)
@@ -150,9 +150,7 @@ def main(args):
             fname = 'error-' + x + '.csv'
             fp = open(fname, 'x')
             fp.close()
-            # exit()
             trainer = Trainer(board, model, argsLearn, maxsize, row, col, maxrow, maxcol, fname)
-            
             trainer.learn()
       else:
             print('play')
