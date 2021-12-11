@@ -97,7 +97,6 @@ def main(args):
       model = torchBasic(board_size, action_size, device)
       if len(args) > 1:
             model.load_state_dict(torch.load(args[1]))
-            # argsLearn['checkpoint_path'] = args[1]
       if len(args) < 3:
             x = str(datetime.datetime.now())
             fname = './error/error-' + x + '.csv'

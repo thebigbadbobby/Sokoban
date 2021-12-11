@@ -2,6 +2,17 @@
 ### Introduction
 This program generates two competing neural network models, one that is trained to create difficult sokobans, and
 another that is trained to solve them. The models use Monte Carlo branching to find the solution based on a learned probability distrobution output from the network, which serves as the Q function when normalized. The Q function is the function that assigns an efficiency score to a State — Action pair. In order to develop an effective Q-function, the solution network is trained to yield a Q-score of 1 for State - Action pairs in the traceback of moves from all successful solutions. Similarly, the generation network is trained to yield a Q-score of 1 for all State-Action pairs for all sokobans that were unable to be solved within a threshhold number moves. That way, the solution network learns to give a higher Q-score for actions that lead to the sokoban being solved, whereas the generation network learns to give a higher Q-score for actions that create difficult sokobans.
+### How to run
+pip3 install -r requirements.txt<br/><br/>
+To Train: python3 sokoban.py [location of game map input] [location of model (pth file)]* <br/>
+
+To play: python3 sokoban.py [location of game map input] [location of model (pth file)] play
+<br/>
+"*" = optional
+<br/>
+
+Note: Generated model file is called latest.pth in models directory. Rename if you want to keep it/prevent overwriting!
+LOOK AT FINAL REPORT FOR THIS INFORMATION, EVERYTHING BELOW IS OUTDATED (INTRO MIGHT BE OUTDATED TOO)
 ### Training Diagram
 <img width="1682" alt="Screen Shot 2021-11-17 at 9 12 35 AM" src="https://user-images.githubusercontent.com/17601102/142249416-901fb88c-0b96-4e00-8f37-37d931f88048.png">
 <img width="235" alt="Screen Shot 2021-11-18 at 2 23 57 PM" src="https://user-images.githubusercontent.com/17601102/142506460-aed93db1-b4e8-49e1-ac23-358f36d85b39.png">
