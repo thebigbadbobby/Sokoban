@@ -55,7 +55,7 @@ class play:
                     ret.append((hist_state, hist_action_probs, reward))
                 self.train(ret)
                 filename = self.args['checkpoint_path']
-                self.save_checkpoint(folder=".", filename=filename)
+                self.save_checkpoint(folder="./models/", filename=filename)
                 if reward == 0: # reset
                     play = []
                     copyBoard = copy.deepcopy(self.game.getBoard())
