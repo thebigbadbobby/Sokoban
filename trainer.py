@@ -1,3 +1,6 @@
+# Note:
+# Code based off: https://github.com/JoshVarty/AlphaZeroSimple/blob/master/trainer.py
+
 import os
 import numpy as np
 from random import shuffle
@@ -8,7 +11,7 @@ import torch.optim as optim
 from MonteCarlo.BasicMonte import MCTS
 from game import game as Game
 import copy
-
+verbose = False
 class Trainer:
 
     def __init__(self, board, model, args, size, row, col, maxrow, maxcol, fname):
@@ -35,15 +38,13 @@ class Trainer:
         print(self.game.toString(state))
         while True:
             print("exec_loop#: ", exec_loop)
-            # time.sleep(5)
-            board = copy.deepcopy(state)
+            board = np.ndarray.flatten(state)
+
             self.mcts = MCTS(self.game, self.model, self.args, self.maxrow, self.maxcol, self.row, self.col)
             root = self.mcts.run(self.model, board)
             action_probs = [0 for _ in range(self.action_size)]
             i = 0
             for k in root.children.keys():
-                # print(type(root.children[k]))
-                # exit()
                 action_probs[i] = root.children[k].visit_count
                 i+=1
 
@@ -51,19 +52,20 @@ class Trainer:
             train_examples.append((board, action_probs))
 
             action = root.select_action(temperature=0)
-            print(action)
-            print('GETTING DA MOVE')
-            #maybe get action URLD from next state?
-            state = self.game.get_next_state(action, state, True)
+            state, _ = self.game.get_next_state(action, state, True)
+            if verbose:
+                print(action)
             print('state after move')
             print(self.game.toString(state))
             reward = self.game.get_reward_for_player(state)
             if exec_loop > self.args['loopStop'] and not reward:
                 reward = 0
+            if verbose:
+                print('reward')
+                print(reward)
             if reward is not None:
                 ret = []
                 for hist_state, hist_action_probs in train_examples:
-                    # [Board, currentPlayer, actionProbabilities, Reward]
                     ret.append((hist_state, hist_action_probs, reward))
 
                 return ret
@@ -77,19 +79,16 @@ class Trainer:
             train_examples = []
             for eps in range(self.args['numEps']):
                 print('eps #: ', eps)
-                print('new eps here')
-                print('dsalkfasdlkfa;sfasfd')
-                print('ldsfakdsfdsa')
                 iteration_train_examples = self.execute_episode()
                 train_examples.extend(iteration_train_examples)
 
             shuffle(train_examples)
             self.train(train_examples, i)
             filename = self.args['checkpoint_path']
-            self.save_checkpoint(folder=".", filename=filename)
+            self.save_checkpoint(folder="./models/", filename=filename)
 
     def train(self, examples, iteration):
-        optimizer = optim.Adam(self.model.parameters(), lr=5e-4)
+        optimizer = optim.SGD(self.model.parameters(), lr=5e-5)
         pi_losses = []
         v_losses = []
         for epoch in range(self.args['epochs']):
@@ -127,9 +126,6 @@ class Trainer:
             file1.write(str(epoch) + ",")
             file1.write(str(np.format_float_positional(np.mean(pi_losses)) + ","))
             file1.write(str(np.format_float_positional(np.mean(v_losses))) + "\n")
-            # file1.write("Examples:")
-            # file1.write(out_pi[0].detach())
-            # file1.write(target_pis[0])
             file1.close()
             print()
             print("Policy Loss", np.mean(pi_losses))

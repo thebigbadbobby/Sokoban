@@ -1,21 +1,18 @@
-import torch
+# Note:
+# Adopted code from source: https://github.com/JoshVarty/AlphaZeroSimple/blob/master/monte_carlo_tree_search.py
+
 import math
 import numpy as np
-# import Node as Node
-import time
-import copy
+
+import random
+verbose = False
+
 def ucb_score(parent, child):
     """
     The score for an action that would transition between the parent and child.
     """
     prior_score = child.prior * math.sqrt(parent.visit_count) / (child.visit_count + 1)
-    if child.visit_count > 0:
-        # The value of the child is from the perspective of the opposing player
-        value_score = -child.value()
-    else:
-        value_score = 0
-
-    return value_score + prior_score
+    return prior_score
 
 class Node:
     def __init__(self, prior):
@@ -37,14 +34,33 @@ class Node:
         """
         Select action according to the visit count distribution and the temperature.
         """
+        visit_actionPairs = []
         visit_counts = np.array([child.visit_count for child in self.children.values()])
         actions = [action for action in self.children.keys()]
-        # print(actions)
-        # print(visit_counts)
+        for i in range(0, len(actions)):
+            visit_actionPairs.append((visit_counts[i], actions[i]))
+        
         if temperature == 0:
-            action = actions[np.argmax(visit_counts)]
+            best = []
+            for pair in visit_actionPairs:
+                if not best:
+                    best.append(pair)
+                    continue
+                if best and pair[0] > best[0][0]:
+                    best = [pair]
+                    continue
+                if best and pair[0] == best[0][0]:
+                    best.append(pair)
+            random.shuffle(best)
+            if verbose:
+                print('best in move')
+                print(best)
+            action = best[0][1]
         elif temperature == float("inf"):
-            action = np.random.choice(actions)
+            try:
+                action = actions[np.random.randint(0,np.argmax(actions)-1)]
+            except:
+                action=actions[0]
         else:
             # See paper appendix Data Generation
             visit_count_distribution = visit_counts ** (1 / temperature)
@@ -58,34 +74,24 @@ class Node:
         """
         Select the child with the highest UCB score.
         """
-        best_score = -np.inf
+        best = []
         cords = game.findPerson(state)
-        best_action = (0, 0)
-        best_child = None
         for action, child in self.children.items():
             score = ucb_score(self, child)
-            # print(score)
-            # print(action)
-            # print(cords)
-            # time.sleep(1)
-            if score > best_score and game.checkValid(action, state):
-                best_score = score
-                best_action = action
-                best_child = child
-        if not best_child:
+            if not best:
+                best.append((score, action, child))
+                continue
+            if best and score > best[0][0] and game.checkValid(action, state):
+                best = [(score, action, child)]
+                continue
+            if best and score == best[0][0] and game.checkValid(action, state):
+                best.append((score, action, child))
+        if not best:
             print('wee woo invalid')
             exit()
-            # print()
-            # print('not bsts child')
-            for action, child in self.children.items():
-                score = ucb_score(self, child)
-                # print(action)
-                if score > best_score:
-                    best_score = score
-                    best_action = action
-                    best_child = child
-        # print("best_action: ", best_action)
-        # print("game location: ", game.findPerson())
+        random.shuffle(best)
+        best_action = best[0][1]
+        best_child = best[0][2]
         return best_action, best_child
 
     def expand(self, state, action_probs, game):
@@ -100,26 +106,18 @@ class Node:
             for j in range(0, len(action_probs[i])):
                 prob = action_probs[i][j]
                 if game.checkValid((i, j), state):
-                    # print('inside')
-                    # print(i, j, prob)
-                    # print(cords)
                     if prob != 0:
                         self.children[(i, j)] = Node(prior = prob)
                         probMissing -= prob
                     else:
-                        # print(i, j)
                         missedValid.append((i, j))
         # for the cases where we missed some children cuz of 0 prob
         for c in missedValid:
-            print("cords missing")
-            print(probMissing)
-            print(c)
+            if verbose:
+                print("cords missing")
+                print(probMissing)
+                print(c)
             self.children[c] = Node(prior = probMissing/len(missedValid))
-            exit()
-                        
-        # for a, prob in enumerate(action_probs):
-        #     if prob != 0:
-        #         self.children[a] = Node(prior=prob)
 
     def __repr__(self):
         """
@@ -143,32 +141,28 @@ class MCTS:
 
         root = Node(0)
 
-        # EXPAND root
         #state needs to be 1xnumofelements array
         action_probs, value = model.predict(state)
         # translate action_probs into a mxn array
-        # ogAction_probs = action_probs
         action_probs = np.array(action_probs).reshape(self.row, self.col) # map these to a size var
-        # print(ogAction_probs.shape)
         valid_moves = self.game.get_valid_moves(state) #we know the moves can be up, left, down right so mask based off of position
         action_probs = action_probs * valid_moves  # mask invalid moves
         action_probs /= np.sum(action_probs)
         root.expand(state, action_probs, self.game)
-
         for _ in range(self.args['num_simulations']):
             node = root
             search_path = [node]
             
-            # SELECT
+            # Select which node to play and maybe expand
             while node and node.expanded():
                 action, node = node.select_child(self.game, node.state)
                 search_path.append(node)
-                # print(node)
             parent = search_path[-2]
             state = parent.state
             # Now we're at a leaf node and we would like to expand
             # Players always play from their own perspective
-            next_state = self.game.get_next_state(action, copy.deepcopy(state))
+            next_state, _ = self.game.get_next_state(action, state)
+
             # The value of the new state from the perspective of the other player
             value = self.game.get_reward_for_player(next_state) # a function that determines if we finished or 
             if value is None:
@@ -181,7 +175,6 @@ class MCTS:
                 action_probs = action_probs * valid_moves  # mask invalid moves
                 action_probs /= np.sum(action_probs)
                 node.expand(next_state, action_probs, self.game)
-                # exit()
 
             self.backpropagate(search_path, value)
 

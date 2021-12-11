@@ -71,7 +71,7 @@ def trace(game, commandHistory):
     clearset=game.clearSet()
     boardarray=[]
     for command in commandHistory[::-1]:
-        if command!='start' and game.isWon()!=True:
+        if command!='start' and game.isWon(game.board)!=True:
             # print(game.toString())
             a=copy.deepcopy(game.board)
             boardarray.append(a)
