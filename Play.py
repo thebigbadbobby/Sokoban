@@ -23,13 +23,11 @@ class play:
         state = self.game.getBoard()
         exec_loop = 0
         train_examples = []
-        if verbose:
-            print('init board')
-            print(self.game.toString(state))
+        print('init board')
+        print(self.game.toString(state))
         while not self.game.isWon(state):
             board = np.ndarray.flatten(state)
-            if verbose:
-                print("exec_loop#: ", exec_loop)
+            print("exec_loop#: ", exec_loop)
             self.mcts = MCTS(self.game, self.model, self.args, self.maxrow, self.maxcol, self.row, self.col)
             root = self.mcts.run(self.model, board)
             action_probs = [0 for _ in range(self.action_size)]
@@ -45,8 +43,8 @@ class play:
             state, move = self.game.get_next_state(action, state, True)
             if verbose:
                 print(action)
-                print('state after move')
-                print(self.game.toString(state))
+            print('state after move')
+            print(self.game.toString(state))
             play.append(move)
             reward = self.game.get_reward_for_player(state)
             if exec_loop > self.args['loopStop'] and not reward:
@@ -100,13 +98,12 @@ class play:
             optimizer.zero_grad()
             total_loss.backward()
             optimizer.step()
-            if verbose:
-                print()
-                print("Policy Loss", np.mean(pi_losses))
-                print("Value Loss", np.mean(v_losses))
-                print("Examples:")
-                print(out_pi[0].detach())
-                print(target_pis[0])
+            print()
+            print("Policy Loss", np.mean(pi_losses))
+            print("Value Loss", np.mean(v_losses))
+            print("Examples:")
+            print(out_pi[0].detach())
+            print(target_pis[0])
 
     def loss_pi(self, targets, outputs):
         loss = -(targets * torch.log(outputs)).sum(dim=1)

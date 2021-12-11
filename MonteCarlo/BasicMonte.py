@@ -1,25 +1,16 @@
 # Note:
 # Adopted code from source: https://github.com/JoshVarty/AlphaZeroSimple/blob/master/monte_carlo_tree_search.py
 
-import torch
 import math
 import numpy as np
 import random
-# import Node as Node
-import time
 verbose = False
 def ucb_score(parent, child):
     """
     The score for an action that would transition between the parent and child.
     """
     prior_score = child.prior * math.sqrt(parent.visit_count) / (child.visit_count + 1)
-    # if child.visit_count > 0:
-    #     # The value of the child is from the perspective of the opposing player
-    #     value_score = -child.value()
-    # else:
-    #     value_score = 0
-
-    return prior_score #value_score + 
+    return prior_score
 
 class Node:
     def __init__(self, prior):
@@ -148,7 +139,6 @@ class MCTS:
 
         root = Node(0)
 
-        # EXPAND root
         #state needs to be 1xnumofelements array
         action_probs, value = model.predict(state)
         # translate action_probs into a mxn array
@@ -161,11 +151,10 @@ class MCTS:
             node = root
             search_path = [node]
             
-            # SELECT
+            # Select which node to play and maybe expand
             while node and node.expanded():
                 action, node = node.select_child(self.game, node.state)
                 search_path.append(node)
-                # print(node)
             parent = search_path[-2]
             state = parent.state
             # Now we're at a leaf node and we would like to expand
