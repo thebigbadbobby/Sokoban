@@ -22,6 +22,31 @@ def arraySum(array):
     return array[0]
 # array=[.25,.25,.25,.25]
 # arraySum(array)
+def encodeboard2(board):
+    # bigboard=np.zeros(size)
+    # bigboard[:np.array(board).shape[0],:np.array(board).shape[1]]=np.array(board)
+    board3d=np.zeros((1,len(board),len(board[0]), 7))
+    i=0
+    for row in board:
+        j=0
+        for entry in row:
+            if entry==0:
+                board3d[0][i,j]=np.array([1,0,0,0,0,0,0])
+            if entry==1:
+                board3d[0][i,j]=np.array([0,1,0,0,0,0,0])
+            if entry==2:
+                board3d[0][i,j]=np.array([0,0,1,0,0,0,0])
+            if entry==10:
+                board3d[0][i,j]=np.array([0,0,0,1,0,0,0])
+            if entry==11:
+                board3d[0][i,j]=np.array([0,0,1,0,1,0,0])
+            if entry==20:
+                board3d[0][i,j]=np.array([0,0,0,0,0,1,0])
+            if entry==21:
+                board3d[0][i,j]=np.array([0,0,0,0,0,0,1])
+            j+=1
+        i+=1
+    return board3d
 def getActionFromArray(array):
     randnum=random.uniform(0,1)
     if randnum < array[0]:

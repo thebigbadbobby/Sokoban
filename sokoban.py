@@ -94,6 +94,7 @@ def main(args):
       sokoban = game(board, row, col, maxrow, maxcol)
       board_size = maxsize
       action_size = maxsize
+      # model = conv2D(board_size, action_size, device, maxrow, maxcol)
       model = torchBasic(board_size, action_size, device)
       if len(args) > 1:
             model.load_state_dict(torch.load(args[1]))

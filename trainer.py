@@ -39,6 +39,7 @@ class Trainer:
         while True:
             print("exec_loop#: ", exec_loop)
             board = np.ndarray.flatten(state)
+
             self.mcts = MCTS(self.game, self.model, self.args, self.maxrow, self.maxcol, self.row, self.col)
             root = self.mcts.run(self.model, board)
             action_probs = [0 for _ in range(self.action_size)]
